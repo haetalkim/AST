@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { User, Settings, HelpCircle, Shield, LogOut, Edit2, Save, X } from 'lucide-react';
+import { User, HelpCircle, Shield, LogOut, Edit2, Save, X } from 'lucide-react';
 import { getMe, getRoster, changePassword, updateMyProfile, setWorkspaceSchool } from '../api/auth';
 import { getSchools } from '../api/schools';
 import { periodsFromClassStructure } from '../utils/classStructure';
