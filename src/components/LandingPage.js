@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, Users } from 'lucide-react';
 import Button from './ui/Button';
 import Field from './ui/Field';
@@ -30,6 +30,8 @@ const WORDMARK_GRADIENT_STYLE = {
   color: 'transparent',
 };
 
+const WORDMARK_TEXT = 'AirStory';
+
 const LandingPage = ({ onLogin, onRegister, onGoogleLogin, authError, authLoading }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -42,6 +44,34 @@ const LandingPage = ({ onLogin, onRegister, onGoogleLogin, authError, authLoadin
     () => AIR_FACTS[Math.floor(Math.random() * AIR_FACTS.length)],
     []
   );
+
+  // One-time wordmark reveal: types out "AirStory", then does a quick color "scan" before
+  // settling into the real brand gradient — as if it just took a reading.
+  const [wordmarkChars, setWordmarkChars] = useState(0);
+  const [wordmarkPhase, setWordmarkPhase] = useState('typing'); // 'typing' | 'detecting' | 'done'
+
+  useEffect(() => {
+    const reduceMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      setWordmarkChars(WORDMARK_TEXT.length);
+      setWordmarkPhase('done');
+      return;
+    }
+    let i = 0;
+    const typeTimer = setInterval(() => {
+      i += 1;
+      setWordmarkChars(i);
+      if (i >= WORDMARK_TEXT.length) {
+        clearInterval(typeTimer);
+        setWordmarkPhase('detecting');
+        setTimeout(() => setWordmarkPhase('done'), 900);
+      }
+    }, 85);
+    return () => clearInterval(typeTimer);
+  }, []);
 
   const handleLoginAttempt = () => {
     if (isSignUp) {
@@ -98,10 +128,13 @@ const LandingPage = ({ onLogin, onRegister, onGoogleLogin, authError, authLoadin
 
             <h1
               aria-label="Air Story"
-              className="text-[56px] sm:text-[72px] lg:text-[88px] leading-[1.02] font-semibold tracking-[-0.02em] mt-6"
+              className={`text-[56px] sm:text-[72px] lg:text-[88px] leading-[1.02] font-semibold tracking-[-0.02em] mt-6 ${
+                wordmarkPhase === 'detecting' ? 'wordmark-detecting' : ''
+              }`}
               style={WORDMARK_GRADIENT_STYLE}
             >
-              AirStory
+              {WORDMARK_TEXT.slice(0, wordmarkChars)}
+              {wordmarkPhase === 'typing' && <span className="wordmark-cursor" aria-hidden="true" />}
             </h1>
             <p className="text-body text-secondary mt-5 max-w-lg" style={{ fontSize: 21, lineHeight: '29px' }}>
               Measure the air your class breathes, then set it beside the city&rsquo;s own sensors.

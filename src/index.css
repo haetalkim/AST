@@ -36,3 +36,55 @@
 html {
   overflow-x: hidden;
 }
+
+/*
+ * Landing page wordmark: types out once on load, then does a brief color "scan" as if
+ * it just took a reading, before settling into the real brand gradient.
+ */
+.wordmark-cursor {
+  display: inline-block;
+  width: 0.05em;
+  height: 0.82em;
+  margin-left: 0.06em;
+  transform: translateY(0.08em);
+  background: var(--primary);
+  animation: wordmark-blink 0.9s steps(1) infinite;
+}
+
+@keyframes wordmark-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.wordmark-detecting {
+  animation: wordmark-detect 0.9s ease-in-out 1;
+}
+
+@keyframes wordmark-detect {
+  0% {
+    filter: hue-rotate(0deg) saturate(1);
+  }
+  22% {
+    filter: hue-rotate(-45deg) saturate(1.6);
+  }
+  48% {
+    filter: hue-rotate(35deg) saturate(1.5);
+  }
+  74% {
+    filter: hue-rotate(-12deg) saturate(1.2);
+  }
+  100% {
+    filter: hue-rotate(0deg) saturate(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wordmark-cursor {
+    animation: none;
+    display: none;
+  }
+  .wordmark-detecting {
+    animation: none;
+  }
+}
