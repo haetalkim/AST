@@ -757,16 +757,18 @@ export default function App() {
       ];
 
   if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-blue-100"
-           style={{
-             backgroundImage: `radial-gradient(#cbd5e1 1px, transparent 1px)`,
-             backgroundSize: '24px 24px'
-           }}
-      >
-        <div className="w-full h-1.5 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-600 sticky top-0 z-50" />
-        <main className="min-h-screen flex flex-col justify-center py-12">
-          {pendingInviteToken ? (
+    // The redesigned LandingPage owns its own full-bleed background/scroll layout,
+    // so give it the bare shell; InviteLanding still wants the original centered card.
+    if (pendingInviteToken) {
+      return (
+        <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-blue-100"
+             style={{
+               backgroundImage: `radial-gradient(#cbd5e1 1px, transparent 1px)`,
+               backgroundSize: '24px 24px'
+             }}
+        >
+          <div className="w-full h-1.5 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-600 sticky top-0 z-50" />
+          <main className="min-h-screen flex flex-col justify-center py-12">
             <InviteLanding
               token={pendingInviteToken}
               isLoggedIn={false}
@@ -777,19 +779,22 @@ export default function App() {
               authError={authError}
               authLoading={authLoading}
             />
-          ) : (
-            <LandingPage
-              onLogin={handleLogin}
-              onRegister={handleRegister}
-              onGoogleLogin={handleGoogleLogin}
-              authError={authError}
-              authLoading={authLoading}
-            />
-          )}
-        </main>
-        <footer className="py-8 text-center text-gray-400 text-sm font-bold uppercase tracking-widest">
-          <p>Air Story • TAMGU LAB @TC</p>
-        </footer>
+          </main>
+          <footer className="py-8 text-center text-gray-400 text-sm font-bold uppercase tracking-widest">
+            <p>Air Story • TAMGU LAB @TC</p>
+          </footer>
+        </div>
+      );
+    }
+    return (
+      <div className="min-h-screen bg-canvas font-sans text-fg selection:bg-blue-100">
+        <LandingPage
+          onLogin={handleLogin}
+          onRegister={handleRegister}
+          onGoogleLogin={handleGoogleLogin}
+          authError={authError}
+          authLoading={authLoading}
+        />
       </div>
     );
   }
