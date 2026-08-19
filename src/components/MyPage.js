@@ -4,6 +4,8 @@ import { getMe, getRoster, changePassword, updateMyProfile, setWorkspaceSchool }
 import { getSchools } from '../api/schools';
 import { periodsFromClassStructure } from '../utils/classStructure';
 import SchoolCombobox from './SchoolCombobox';
+import Button from './ui/Button';
+import Card from './ui/Card';
 
 const MyPage = ({
   workspaceId,
@@ -246,134 +248,127 @@ const MyPage = ({
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Page</h1>
-          <p className="text-gray-600">Manage your profile and preferences</p>
-        </div>
+      <div className="page__head">
+        <h1 className="text-page text-fg">My page</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Card */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
-            <div className="text-center mb-6">
-              <div 
-                className="w-24 h-24 mx-auto rounded-full flex items-center justify-center text-3xl font-bold text-white mb-4"
-                style={{ background: `linear-gradient(135deg, ${theme.primary} 0%, ${theme.primary}CC 100%)` }}
-              >
-                {profileInitials()}
+        <div className="lg:col-span-1 space-y-6">
+          <Card className="text-center">
+            <div
+              className="w-24 h-24 mx-auto rounded-full flex items-center justify-center text-3xl font-semibold text-white mb-4"
+              style={{ background: `linear-gradient(135deg, ${theme.primary} 0%, ${theme.primary}CC 100%)` }}
+            >
+              {profileInitials()}
+            </div>
+            <h2 className="text-tile text-fg">
+              {isTeacherRole
+                ? viewerProfile.displayName || me?.user?.full_name || 'Instructor'
+                : viewerProfile.displayName || me?.user?.full_name || viewerProfile.studentId || filters.studentId || 'Student'}
+            </h2>
+            <p className="text-small text-muted mt-1">
+              {isTeacherRole
+                ? `${viewerProfile.school || filters.school} • ${viewerProfile.instructor || filters.instructor || 'Instructor'}`
+                : `${viewerProfile.school || filters.school} - ${viewerProfile.instructor || filters.instructor} - ${viewerProfile.period || filters.period} - Group ${(viewerProfile.group || filters.group || '').replace('G', '')}`}
+            </p>
+
+            <hr className="hr my-4 border-hairline-soft" />
+
+            <div className="space-y-3 text-left">
+              <div className="flex items-center justify-between text-small">
+                <span className="text-muted">Country</span>
+                <span className="text-fg">{filters.country}</span>
               </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-1">
-                {isTeacherRole
-                  ? viewerProfile.displayName || me?.user?.full_name || 'Instructor'
-                  : viewerProfile.displayName || me?.user?.full_name || viewerProfile.studentId || filters.studentId || 'Student'}
-              </h2>
-              <p className="text-sm text-gray-600">
-                {isTeacherRole
-                  ? `${viewerProfile.school || filters.school} • ${viewerProfile.instructor || filters.instructor || 'Instructor'}`
-                  : `${viewerProfile.school || filters.school} - ${viewerProfile.instructor || filters.instructor} - ${viewerProfile.period || filters.period} - Group ${(viewerProfile.group || filters.group || '').replace('G', '')}`}
-              </p>
+              <div className="flex items-center justify-between text-small">
+                <span className="text-muted">State</span>
+                <span className="text-fg">{filters.state}</span>
+              </div>
+              <div className="flex items-center justify-between text-small">
+                <span className="text-muted">School Code</span>
+                <span className="text-fg">{viewerProfile.school || filters.school}</span>
+              </div>
+              <div className="flex items-center justify-between text-small">
+                <span className="text-muted">Class (Instructor)</span>
+                <span className="text-fg">{viewerProfile.instructor || filters.instructor}</span>
+              </div>
+              <div className="flex items-center justify-between text-small">
+                <span className="text-muted">Period</span>
+                <span className="text-fg">{viewerProfile.period || filters.period}</span>
+              </div>
+              <div className="flex items-center justify-between text-small">
+                <span className="text-muted">Group</span>
+                <span className="text-fg">{viewerProfile.group || filters.group}</span>
+              </div>
             </div>
 
-            <div className="space-y-3 py-4 border-t border-gray-200">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Country</span>
-                <span className="font-medium text-gray-900">{filters.country}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">State</span>
-                <span className="font-medium text-gray-900">{filters.state}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">School Code</span>
-                <span className="font-medium text-gray-900">{viewerProfile.school || filters.school}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Class (Instructor)</span>
-                <span className="font-medium text-gray-900">{viewerProfile.instructor || filters.instructor}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Period</span>
-                <span className="font-medium text-gray-900">{viewerProfile.period || filters.period}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Group</span>
-                <span className="font-medium text-gray-900">{viewerProfile.group || filters.group}</span>
-              </div>
-            </div>
-
-            <button
-              type="button"
+            <Button
+              wide
+              className="mt-6"
               onClick={() => {
                 setTempFilters({ ...filters });
                 setProfileSaveError('');
                 setIsEditing(true);
               }}
-              className={`w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 ${theme.bg} ${theme.hover} text-white font-medium rounded-lg transition-all`}
             >
               <Edit2 className="w-4 h-4" />
-              Edit Profile
-            </button>
-          </div>
+              Edit profile
+            </Button>
+          </Card>
 
           {/* Quick Actions */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200 mt-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+          <Card>
+            <h3 className="text-tile text-fg mb-4">Quick actions</h3>
             <div className="space-y-2">
-              <button className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
-                <HelpCircle className="w-5 h-5 text-gray-400" />
-                <span className="text-sm font-medium">Help & Support</span>
+              <button className="w-full flex items-center gap-3 px-4 py-3 text-left text-secondary hover:bg-canvas rounded-ctrl transition-colors">
+                <HelpCircle className="w-5 h-5 text-muted" />
+                <span className="text-small font-medium">Help & Support</span>
               </button>
-              <button className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
-                <Shield className="w-5 h-5 text-gray-400" />
-                <span className="text-sm font-medium">Privacy Settings</span>
+              <button className="w-full flex items-center gap-3 px-4 py-3 text-left text-secondary hover:bg-canvas rounded-ctrl transition-colors">
+                <Shield className="w-5 h-5 text-muted" />
+                <span className="text-small font-medium">Privacy Settings</span>
               </button>
               <button
                 onClick={onLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 text-left text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-3 text-left text-aqi-unhealthy hover:bg-canvas rounded-ctrl transition-colors"
               >
                 <LogOut className="w-5 h-5" />
-                <span className="text-sm font-medium">Sign Out</span>
+                <span className="text-small font-medium">Sign Out</span>
               </button>
             </div>
-          </div>
+          </Card>
 
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200 mt-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+          <Card>
+            <h3 className="text-tile text-fg mb-3">
               {userRole === 'teacher' ? 'Teacher Guide' : 'Student Guide'}
             </h3>
             {(userRole === 'teacher') ? (
-              <ul className="text-sm text-gray-700 space-y-2">
+              <ul className="text-small text-secondary space-y-2">
                 <li>Start in Manage Classes to confirm period/group structure.</li>
                 <li>Use HeatMap for class-level overview, then Raw Data for detailed validation.</li>
                 <li>Review student annotation asterisks (*) before exporting reports.</li>
               </ul>
             ) : (
-              <ul className="text-sm text-gray-700 space-y-2">
+              <ul className="text-small text-secondary space-y-2">
                 <li>Start in HeatMap to understand current conditions.</li>
                 <li>Use Raw Data to review measurements and add responsible edit notes.</li>
                 <li>Use Analysis to summarize trends and add reflection insights.</li>
               </ul>
             )}
-          </div>
+          </Card>
         </div>
 
         {/* Settings Sections */}
         <div className="lg:col-span-2 space-y-6">
           {/* Account Settings */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
-            <div className="flex items-center gap-3 mb-6">
-              <div className={`w-10 h-10 ${theme.bg} rounded-lg flex items-center justify-center`}>
-                <Settings className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900">Account Settings</h3>
-            </div>
+          <Card>
+            <h3 className="text-tile text-fg">Account</h3>
+            <p className="text-small text-muted mt-1">The same in every workspace.</p>
 
-            <div className="space-y-4">
+            <div className="space-y-4 mt-5">
               {schoolEditable && (
                 <div id="school-setting">
-                  <label htmlFor="school-input" className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="school-input" className="block text-small font-semibold text-secondary mb-2">
                     School
                   </label>
                   <div className="flex gap-2">
@@ -383,37 +378,27 @@ const MyPage = ({
                       onChange={(v) => { setSchoolInput(v); setSchoolSaved(false); }}
                       options={schoolOptions.map((s) => s.name)}
                       placeholder="Search or select your school"
-                      inputClassName="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      inputClassName="w-full h-11 px-4 border border-hairline rounded-ctrl bg-surface text-fg text-body focus:outline-none focus:border-link focus:ring-4 focus:ring-[rgba(0,102,204,0.15)]"
                     />
-                    <button
-                      type="button"
-                      onClick={handleSaveSchool}
-                      disabled={schoolBusy}
-                      className={`shrink-0 px-4 py-2 ${theme.bg} ${theme.hover} text-white font-medium rounded-lg transition-colors disabled:opacity-50`}
-                    >
+                    <Button size="sm" className="shrink-0" onClick={handleSaveSchool} disabled={schoolBusy}>
                       {schoolBusy ? 'Saving…' : 'Save'}
-                    </button>
+                    </Button>
                     {(viewerProfile.school || filters.school) && (
-                      <button
-                        type="button"
-                        onClick={handleRemoveSchool}
-                        disabled={schoolBusy}
-                        className="shrink-0 px-4 py-2 text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 font-medium rounded-lg transition-colors disabled:opacity-50"
-                      >
+                      <Button size="sm" variant="danger" className="shrink-0" onClick={handleRemoveSchool} disabled={schoolBusy}>
                         Remove
-                      </button>
+                      </Button>
                     )}
                   </div>
                   {schoolError ? (
-                    <p className="text-xs text-red-600 mt-1">{schoolError}</p>
+                    <p className="text-cap text-aqi-unhealthy mt-1">{schoolError}</p>
                   ) : schoolSaved ? (
-                    <p className="text-xs text-green-600 mt-1">
+                    <p className="text-cap text-aqi-good mt-1">
                       {(viewerProfile.school || filters.school)
                         ? 'School saved. Everyone in this class now shares its school workspace.'
                         : 'School removed. This class is no longer part of a school workspace.'}
                     </p>
                   ) : (
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-cap text-muted mt-1">
                       Sets the school for this whole class — its members join the school workspace and its data reaches other classes at this school. Use Remove to detach it.
                     </p>
                   )}
@@ -421,7 +406,7 @@ const MyPage = ({
               )}
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-small font-semibold text-secondary mb-2">
                   {isTeacherRole ? 'Instructor / staff ID' : 'Student ID'}
                 </label>
                 <input
@@ -432,91 +417,92 @@ const MyPage = ({
                       : filters.studentId
                   }
                   disabled
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed"
+                  className="w-full h-11 px-4 bg-canvas border border-hairline-soft rounded-ctrl text-muted cursor-not-allowed"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-cap text-muted mt-1">
                   {isTeacherRole ? 'Shown for your records; edit placement in Manage Classes for students.' : 'Student ID cannot be changed'}
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+                <label className="block text-small font-semibold text-secondary mb-2">Email address</label>
                 <input
                   type="email"
                   value={me?.user?.email || ''}
                   disabled
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed"
+                  className="w-full h-11 px-4 bg-canvas border border-hairline-soft rounded-ctrl text-muted cursor-not-allowed"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
-                <button
-                  type="button"
+                <label className="block text-small font-semibold text-secondary mb-2">Password</label>
+                <Button
+                  variant="neutral"
+                  wide
+                  className="justify-start"
                   onClick={() => {
                     setPasswordError('');
                     setPasswordNew('');
                     setPasswordEmail(me?.user?.email || '');
                     setShowPasswordModal(true);
                   }}
-                  className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
                 >
-                  Change Password
-                </button>
+                  Change password
+                </Button>
               </div>
             </div>
-          </div>
+          </Card>
 
           {/* Group Members */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+          <Card>
             <div className="flex items-center gap-3 mb-6">
-              <div className={`w-10 h-10 ${theme.bg} rounded-lg flex items-center justify-center`}>
+              <div className={`w-10 h-10 ${theme.bg} rounded-ctrl flex items-center justify-center`}>
                 <User className="w-5 h-5 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900">
+              <h3 className="text-tile text-fg">
                 {(userRole === 'teacher') ? 'Class Members' : 'Group Members'}
               </h3>
             </div>
 
             {/* Instructor */}
-            <div className="mb-6 pb-6 border-b border-gray-200">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Instructor</p>
-              <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-purple-50 to-white rounded-lg border border-purple-200">
-                <User className="w-6 h-6 text-purple-600 flex-shrink-0" />
+            <div className="mb-6 pb-6 border-b border-hairline-soft">
+              <p className="text-cap font-semibold text-muted uppercase tracking-wider mb-3">Instructor</p>
+              <div className="flex items-center gap-3 p-3 bg-canvas rounded-ctrl border border-hairline-soft">
+                <User className="w-6 h-6 text-secondary flex-shrink-0" />
                 <div className="flex-1">
-                  <p className="font-semibold text-gray-900">
+                  <p className="font-semibold text-fg">
                     {instructor.name || viewerProfile.instructor || filters.instructor || '—'}
                   </p>
-                  <p className="text-sm text-gray-600">{instructor.role}</p>
+                  <p className="text-small text-secondary">{instructor.role}</p>
                 </div>
-                <span className="text-xs text-gray-500 font-mono">{instructor.id || '—'}</span>
+                <span className="text-cap text-muted font-mono">{instructor.id || '—'}</span>
               </div>
             </div>
 
             {/* Students */}
             <div>
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+              <p className="text-cap font-semibold text-muted uppercase tracking-wider mb-3">
                 Students by Period and Group
               </p>
               <div className="space-y-4">
                 {Object.keys(groupedStructure).map((bucket) => (
                   <div key={bucket}>
-                    <p className="text-xs font-bold text-gray-500 mb-2">{bucket}</p>
+                    <p className="text-cap font-bold text-muted mb-2">{bucket}</p>
                     <div className="space-y-2">
                       {groupedStructure[bucket].map((member, idx) => (
-                        <div key={`${bucket}-${idx}`} className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                        <div key={`${bucket}-${idx}`} className="flex items-center gap-3 p-3 hover:bg-canvas rounded-ctrl transition-colors">
                           <div 
-                            className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                            className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-small"
                             style={{ background: `linear-gradient(135deg, ${theme.primary} 0%, ${theme.primary}CC 100%)` }}
                           >
                             {member.name.charAt(0)}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium text-gray-900 truncate">{member.name}</p>
-                            <p className="text-sm text-gray-600">{member.role}</p>
+                            <p className="font-medium text-fg truncate">{member.name}</p>
+                            <p className="text-small text-secondary">{member.role}</p>
                           </div>
                           <span
-                            className="max-w-[11rem] truncate text-xs text-gray-500 font-mono"
+                            className="max-w-[11rem] truncate text-cap text-muted font-mono"
                             title={member.contact}
                           >
                             {member.contact}
@@ -525,7 +511,7 @@ const MyPage = ({
                             (member.studentCode && member.studentCode === (viewerProfile.studentId || filters.studentId))
                             || (member.email && me?.user?.email && member.email.toLowerCase() === String(me.user.email).toLowerCase())
                           ) && (
-                            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                            <span className="px-2 py-0.5 rounded-pill text-cap font-semibold border border-hairline bg-canvas text-link">
                               You
                             </span>
                           )}
@@ -536,55 +522,55 @@ const MyPage = ({
                 ))}
               </div>
             </div>
-          </div>
+          </Card>
 
           {/* About */}
-          <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 shadow-lg border border-gray-200">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">About Air Story</h3>
-            <div className="space-y-3 text-sm text-gray-600">
+          <Card flat>
+            <h3 className="text-tile text-fg mb-4">About Air Story</h3>
+            <div className="space-y-3 text-small text-secondary">
               <p>
-                <strong className="text-gray-900">Version:</strong> 1.0.0
+                <strong className="text-fg">Version:</strong> 1.0.0
               </p>
               <p>
-                <strong className="text-gray-900">Last Updated:</strong> June 25, 2026
+                <strong className="text-fg">Last Updated:</strong> June 25, 2026
               </p>
               <p>
                 Air Story is a comprehensive air quality monitoring platform designed for schools and communities.
               </p>
               <div className="flex flex-wrap gap-4 mt-4">
-                <button type="button" className="text-blue-600 hover:text-blue-700 font-medium bg-transparent border-0 p-0 cursor-pointer">
+                <button type="button" className="text-link hover:underline font-medium bg-transparent border-0 p-0 cursor-pointer">
                   Terms of Service
                 </button>
-                <button type="button" className="text-blue-600 hover:text-blue-700 font-medium bg-transparent border-0 p-0 cursor-pointer">
+                <button type="button" className="text-link hover:underline font-medium bg-transparent border-0 p-0 cursor-pointer">
                   Privacy Policy
                 </button>
-                <button type="button" className="text-blue-600 hover:text-blue-700 font-medium bg-transparent border-0 p-0 cursor-pointer">
+                <button type="button" className="text-link hover:underline font-medium bg-transparent border-0 p-0 cursor-pointer">
                   Contact
                 </button>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       </div>
 
       {/* Edit Profile Modal */}
       {isEditing && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={handleCancel}>
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className={`${theme.bg} text-white p-6 rounded-t-2xl flex items-center justify-between`}>
-              <h3 className="text-xl font-bold">Edit Profile</h3>
-              <button onClick={handleCancel} className="p-1 hover:bg-white/20 rounded-lg transition-colors">
+          <div className="bg-surface rounded-card max-w-md w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className={`${theme.bg} text-white p-6 rounded-t-[18px] flex items-center justify-between`}>
+              <h3 className="text-tile">Edit profile</h3>
+              <button onClick={handleCancel} className="p-1 hover:bg-white/20 rounded-ctrl transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
             
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Country</label>
+                <label className="block text-small font-semibold text-secondary mb-2">Country</label>
                 <select
                   value={tempFilters.country}
                   onChange={(e) => setTempFilters({ ...tempFilters, country: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full h-11 px-4 border border-hairline rounded-ctrl bg-surface text-fg focus:outline-none focus:border-link focus:ring-4 focus:ring-[rgba(0,102,204,0.15)]"
                 >
                   <option value="US">United States</option>
                   <option value="CA">Canada</option>
@@ -594,11 +580,11 @@ const MyPage = ({
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">State/Province</label>
+                <label className="block text-small font-semibold text-secondary mb-2">State/Province</label>
                 <select
                   value={tempFilters.state}
                   onChange={(e) => setTempFilters({ ...tempFilters, state: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full h-11 px-4 border border-hairline rounded-ctrl bg-surface text-fg focus:outline-none focus:border-link focus:ring-4 focus:ring-[rgba(0,102,204,0.15)]"
                 >
                   <option value="">Not set</option>
                   <option value="PA">Pennsylvania</option>
@@ -610,31 +596,31 @@ const MyPage = ({
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">School Code</label>
+                <label className="block text-small font-semibold text-secondary mb-2">School Code</label>
                 <input
                   type="text"
                   value={tempFilters.school}
                   onChange={(e) => setTempFilters({ ...tempFilters, school: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full h-11 px-4 border border-hairline rounded-ctrl bg-surface text-fg focus:outline-none focus:border-link focus:ring-4 focus:ring-[rgba(0,102,204,0.15)]"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Class (Instructor)</label>
+                <label className="block text-small font-semibold text-secondary mb-2">Class (Instructor)</label>
                 <input
                   type="text"
                   value={tempFilters.instructor}
                   onChange={(e) => setTempFilters({ ...tempFilters, instructor: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full h-11 px-4 border border-hairline rounded-ctrl bg-surface text-fg focus:outline-none focus:border-link focus:ring-4 focus:ring-[rgba(0,102,204,0.15)]"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Period</label>
+                <label className="block text-small font-semibold text-secondary mb-2">Period</label>
                 <select
                   value={tempFilters.period || periodEditOptions[0] || 'P1'}
                   onChange={(e) => setTempFilters({ ...tempFilters, period: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full h-11 px-4 border border-hairline rounded-ctrl bg-surface text-fg focus:outline-none focus:border-link focus:ring-4 focus:ring-[rgba(0,102,204,0.15)]"
                 >
                   {periodEditOptions.map((p) => (
                     <option key={p} value={p}>
@@ -645,17 +631,17 @@ const MyPage = ({
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Group</label>
+                <label className="block text-small font-semibold text-secondary mb-2">Group</label>
                 <div className="grid grid-cols-3 gap-2">
                   {groupEditNums.map((num) => (
                     <button
                       key={num}
                       type="button"
                       onClick={() => setTempFilters({ ...tempFilters, group: `G${num}` })}
-                      className={`py-2 rounded-lg text-sm font-medium transition-all ${
+                      className={`py-2 rounded-ctrl text-small font-medium transition-all ${
                         tempFilters.group === `G${num}`
-                          ? `${theme.bg} text-white shadow-md`
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          ? `${theme.bg} text-white`
+                          : 'bg-canvas text-secondary hover:bg-hairline-soft'
                       }`}
                     >
                       G{num}
@@ -667,27 +653,17 @@ const MyPage = ({
 
             {profileSaveError ? (
               <div className="px-6 pb-2">
-                <p className="text-sm text-red-600">{profileSaveError}</p>
+                <p className="text-small text-aqi-unhealthy">{profileSaveError}</p>
               </div>
             ) : null}
-            <div className="p-6 border-t border-gray-200 flex gap-3">
-              <button
-                type="button"
-                onClick={handleCancel}
-                disabled={profileSaveBusy}
-                className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
-              >
+            <div className="p-6 border-t border-hairline-soft flex gap-3">
+              <Button variant="neutral" wide onClick={handleCancel} disabled={profileSaveBusy}>
                 Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={profileSaveBusy}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 ${theme.bg} ${theme.hover} text-white font-semibold rounded-lg transition-colors disabled:opacity-50`}
-              >
+              </Button>
+              <Button wide onClick={handleSave} disabled={profileSaveBusy}>
                 <Save className="w-4 h-4" />
-                {profileSaveBusy ? 'Saving…' : 'Save Changes'}
-              </button>
+                {profileSaveBusy ? 'Saving…' : 'Save changes'}
+              </Button>
             </div>
           </div>
         </div>
@@ -699,54 +675,50 @@ const MyPage = ({
           onClick={() => !passwordBusy && setShowPasswordModal(false)}
         >
           <div
-            className="bg-white rounded-2xl max-w-md w-full shadow-2xl"
+            className="bg-surface rounded-card max-w-md w-full shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className={`${theme.bg} text-white p-6 rounded-t-2xl flex items-center justify-between`}>
-              <h3 className="text-xl font-bold">Change password</h3>
+            <div className={`${theme.bg} text-white p-6 rounded-t-[18px] flex items-center justify-between`}>
+              <h3 className="text-tile">Change password</h3>
               <button
                 type="button"
                 onClick={() => !passwordBusy && setShowPasswordModal(false)}
-                className="p-1 hover:bg-white/20 rounded-lg transition-colors"
+                className="p-1 hover:bg-white/20 rounded-ctrl transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
             <form onSubmit={handlePasswordSubmit} className="p-6 space-y-4">
-              <p className="text-sm text-gray-600">
+              <p className="text-small text-secondary">
                 Confirm your email and choose a new password. You will be signed out and can log in again.
               </p>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                <label className="block text-small font-semibold text-secondary mb-2">Email</label>
                 <input
                   type="email"
                   required
                   value={passwordEmail}
                   onChange={(e) => setPasswordEmail(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full h-11 px-4 border border-hairline rounded-ctrl bg-surface text-fg focus:outline-none focus:border-link focus:ring-4 focus:ring-[rgba(0,102,204,0.15)]"
                   autoComplete="username"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">New password</label>
+                <label className="block text-small font-semibold text-secondary mb-2">New password</label>
                 <input
                   type="password"
                   required
                   minLength={8}
                   value={passwordNew}
                   onChange={(e) => setPasswordNew(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full h-11 px-4 border border-hairline rounded-ctrl bg-surface text-fg focus:outline-none focus:border-link focus:ring-4 focus:ring-[rgba(0,102,204,0.15)]"
                   autoComplete="new-password"
                 />
               </div>
-              {passwordError ? <p className="text-sm text-red-600">{passwordError}</p> : null}
-              <button
-                type="submit"
-                disabled={passwordBusy}
-                className={`w-full py-3 rounded-lg font-semibold text-white ${theme.bg} ${theme.hover} disabled:opacity-50`}
-              >
+              {passwordError ? <p className="text-small text-aqi-unhealthy">{passwordError}</p> : null}
+              <Button type="submit" wide disabled={passwordBusy}>
                 {passwordBusy ? 'Updating…' : 'Update password'}
-              </button>
+              </Button>
             </form>
           </div>
         </div>
