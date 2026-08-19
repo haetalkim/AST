@@ -449,46 +449,49 @@ export default function ManageClasses({
           </div>
           <span className="text-cap text-muted text-right">School changes live in My Page</span>
         </div>
-        <div className="statrow grid grid-cols-2 sm:grid-cols-3 gap-px bg-hairline-soft border border-hairline-soft rounded-card overflow-hidden mt-5">
-          <div className="bg-surface p-4">
-            <p className="text-cap text-muted">School · Teacher</p>
-            {hasSchool ? (
-              <p className="text-page text-fg mt-1">{viewerProfile.school}</p>
-            ) : (
-              <p className="text-page text-fg mt-1">
-                <span className="text-muted">Not set</span>{' '}
-                <button
-                  type="button"
-                  onClick={onEditSchool}
-                  className="align-middle text-small font-semibold text-link hover:underline"
-                >
-                  (Edit)
-                </button>
-              </p>
-            )}
-            <p className="text-small text-muted mt-1">{teacherName}</p>
+        <div className="divide-y divide-hairline-soft mt-4">
+          <div className="flex items-start justify-between gap-4 py-3">
+            <p className="text-small text-muted">School · Teacher</p>
+            <div className="text-right">
+              {hasSchool ? (
+                <p className="text-small font-medium text-fg">{viewerProfile.school}</p>
+              ) : (
+                <p className="text-small font-medium text-fg">
+                  <span className="text-muted font-normal">Not set</span>{' '}
+                  <button
+                    type="button"
+                    onClick={onEditSchool}
+                    className="text-small font-semibold text-link hover:underline"
+                  >
+                    (Edit)
+                  </button>
+                </p>
+              )}
+              <p className="text-cap text-muted mt-0.5">{teacherName}</p>
+            </div>
           </div>
-          <div className="bg-surface p-4">
-            <p className="text-cap text-muted">Periods</p>
-            <p className="text-page text-fg mt-1">{savedPeriods.length}</p>
-            <p className="text-small text-muted mt-1">{savedPeriods.join(', ') || '—'}</p>
+          <div className="flex items-center justify-between gap-4 py-3">
+            <p className="text-small text-muted">Periods</p>
+            <p className="text-small font-medium text-fg">{savedPeriods.join(', ') || '—'}</p>
           </div>
-          <div className="bg-surface p-4">
-            <p className="text-cap text-muted">Groups per period</p>
-            <p className="text-tile text-fg mt-1">
+          <div className="flex items-center justify-between gap-4 py-3">
+            <p className="text-small text-muted">Groups per period</p>
+            <p className="text-small font-medium text-fg">
               {savedPeriods.map((p) => `${p} · ${savedGroupCounts[p] || 0}`).join(', ') || '—'}
             </p>
           </div>
-          <div className="bg-surface p-4">
-            <p className="text-cap text-muted">Members joined</p>
-            <p className="text-page text-fg mt-1">{studentMembers.length}</p>
+          <div className="flex items-center justify-between gap-4 py-3">
+            <p className="text-small text-muted">Members joined</p>
+            <p className="text-small font-medium text-fg">{studentMembers.length}</p>
           </div>
-          <div className="bg-surface p-4">
-            <p className="text-cap text-muted">Group coverage</p>
-            <p className={`text-page mt-1 ${coverageWarn ? 'text-aqi-usg' : 'text-aqi-good'}`}>
-              {coveredGroups} of {totalGroupSlots}
-            </p>
-            {coverageWarn && <p className="text-small text-aqi-usg mt-1">Some groups have no account</p>}
+          <div className="flex items-start justify-between gap-4 py-3">
+            <p className="text-small text-muted">Group coverage</p>
+            <div className="text-right">
+              <p className={`text-small font-medium ${coverageWarn ? 'text-aqi-usg' : 'text-aqi-good'}`}>
+                {coveredGroups} of {totalGroupSlots}
+              </p>
+              {coverageWarn && <p className="text-cap text-muted mt-0.5">Some groups have no account</p>}
+            </div>
           </div>
         </div>
       </Card>
