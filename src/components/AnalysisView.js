@@ -10,6 +10,7 @@ import {
   ChevronDown,
   GitCompareArrows,
   GraduationCap,
+  HelpCircle,
   Info,
   Lightbulb,
   MapPin,
@@ -39,6 +40,35 @@ import BoxPlot from './charts/BoxPlot';
 import ChartFrame from './charts/ChartFrame';
 import ReflectionPrompt from './charts/ReflectionPrompt';
 import Button from './ui/Button';
+import GuidedTour from './ui/GuidedTour';
+
+const TOUR_STEPS = [
+  {
+    selector: '[data-tour="metric-chips"]',
+    title: 'Start with a metric',
+    body: 'Pick PM 2.5, CO, temperature, or humidity — every chart below focuses on whichever one is selected.',
+  },
+  {
+    selector: '[data-tour="period-group"]',
+    title: 'Narrow the focus',
+    body: "As a teacher, you can zoom into one period or group instead of the whole class.",
+  },
+  {
+    selector: '[data-tour="view-toggle"]',
+    title: 'Choose how to see it',
+    body: 'Turn chart sections on or off — recent readings, trends, distribution, box plot, scatter, and insights.',
+  },
+  {
+    selector: '[data-tour="compare-tab"]',
+    title: 'Compare against others',
+    body: 'Switch here to line your data up against other groups, your class, your school, or nearby city sensors.',
+  },
+  {
+    selector: '[data-tour="send-to-workspace"]',
+    title: 'Save what matters',
+    body: 'Any chart with this button can be pinned straight to your Workspace tab, ready to present later.',
+  },
+];
 
 /** Shared "good defaults" axis styling: visible axis line + tick line, per the chart-defaults checklist item. */
 const AXIS_STYLE = { fontSize: '12px' };
@@ -538,6 +568,7 @@ const AnalysisView = ({
   // Teachers see every period/group in the class — focus controls narrow Analysis immersion.
   const [focusPeriod, setFocusPeriod] = useState(filters.period || 'all');
   const [focusGroup, setFocusGroup] = useState(filters.group || 'all');
+  const [showTour, setShowTour] = useState(false);
   const [openSections, setOpenSections] = useState({
     recent: true,
     trends: true,
@@ -945,7 +976,20 @@ const AnalysisView = ({
     <div className="space-y-6">
       {/* Header + view tabs */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-page text-fg">Analysis</h1>
+        <div className="flex items-center gap-2.5">
+          <h1 className="text-page text-fg">Analysis</h1>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab('overview');
+              setShowTour(true);
+            }}
+            className="inline-flex items-center gap-1.5 h-7 px-2.5 text-cap font-semibold text-secondary rounded-pill border border-hairline bg-surface hover:bg-canvas transition-colors"
+          >
+            <HelpCircle className="h-3.5 w-3.5" aria-hidden="true" />
+            How to
+          </button>
+        </div>
         <div className="seg inline-flex rounded-pill border border-hairline bg-surface p-[3px] gap-0.5">
           <button
             onClick={() => setActiveTab('overview')}
@@ -958,6 +1002,7 @@ const AnalysisView = ({
             Overview
           </button>
           <button
+            data-tour="compare-tab"
             onClick={() => setActiveTab('compare')}
             aria-pressed={activeTab === 'compare'}
             className={`flex items-center gap-2 px-4 h-9 rounded-pill text-small transition-all ${
@@ -975,31 +1020,33 @@ const AnalysisView = ({
       {(hasData || isTeacher) && (
         <div className="filters sticky top-20 z-30 rounded-card border border-hairline-soft bg-surface/95 px-3 py-2.5 backdrop-blur space-y-2">
           <div className="frow flex flex-wrap items-center gap-2">
-            {Object.entries(metricThemes).map(([key, metric]) => (
-              <button
-                key={key}
-                onClick={() => setSelectedMetric(key)}
-                className={`chip h-8 px-3.5 rounded-pill text-small border transition-colors ${
-                  selectedMetric === key
-                    ? `${metric.bg} text-white border-transparent`
-                    : 'bg-surface text-secondary border-hairline hover:bg-canvas'
-                }`}
-              >
-                {metric.label}
-              </button>
-            ))}
-            {hasData && hasHealthThreshold(selectedMetric) && (
-              <span
-                className="badge inline-flex items-center gap-1.5 h-8 px-3 rounded-pill text-cap font-semibold"
-                style={{ backgroundColor: getColorForValue(avgValue, selectedMetric), color: '#1F2937' }}
-              >
-                Avg: {getStatusLabel(avgValue, selectedMetric)}
-              </span>
-            )}
+            <div data-tour="metric-chips" className="flex flex-wrap items-center gap-2">
+              {Object.entries(metricThemes).map(([key, metric]) => (
+                <button
+                  key={key}
+                  onClick={() => setSelectedMetric(key)}
+                  className={`chip h-8 px-3.5 rounded-pill text-small border transition-colors ${
+                    selectedMetric === key
+                      ? `${metric.bg} text-white border-transparent`
+                      : 'bg-surface text-secondary border-hairline hover:bg-canvas'
+                  }`}
+                >
+                  {metric.label}
+                </button>
+              ))}
+              {hasData && hasHealthThreshold(selectedMetric) && (
+                <span
+                  className="badge inline-flex items-center gap-1.5 h-8 px-3 rounded-pill text-cap font-semibold"
+                  style={{ backgroundColor: getColorForValue(avgValue, selectedMetric), color: '#1F2937' }}
+                >
+                  Avg: {getStatusLabel(avgValue, selectedMetric)}
+                </span>
+              )}
+            </div>
             {/* Period/Group focus — same row as the metric chips, just set off with a
                 hairline divider instead of pushed to its own row. */}
             {isTeacher && (
-              <div className="ml-auto flex flex-wrap items-center gap-3 pl-3 border-l border-hairline-soft">
+              <div data-tour="period-group" className="ml-auto flex flex-wrap items-center gap-3 pl-3 border-l border-hairline-soft">
                 <label className="relative z-20 flex items-center gap-1.5 text-small text-secondary">
                   <span className="flabel shrink-0">Period</span>
                   <select
@@ -1037,7 +1084,7 @@ const AnalysisView = ({
           {/* Second row: how you're viewing the data (sections) — kept separate since it's a
               different kind of control (which charts render) than the filters above. */}
           {activeTab === 'overview' && hasData && (
-            <div className="frow flex flex-wrap items-center gap-1.5">
+            <div data-tour="view-toggle" className="frow flex flex-wrap items-center gap-1.5">
               <span className="flabel text-small text-muted shrink-0">View</span>
               <div className="segwide flex flex-wrap gap-1 rounded-pill border border-hairline bg-canvas p-1">
                 {[
@@ -1153,7 +1200,7 @@ const AnalysisView = ({
                 )}
               </div>
             </div>
-            <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5" data-export-hide="true">
+            <div data-tour="send-to-workspace" className="flex shrink-0 flex-wrap items-center justify-end gap-1.5" data-export-hide="true">
               <SaveChartButton
                 targetRef={weekChartRef}
                 filename={`recent-week-vs-${referenceLocation}-${metricThemes[selectedMetric].label}`}
@@ -1832,6 +1879,8 @@ const AnalysisView = ({
           </div>
         </div>
       )}
+
+      <GuidedTour steps={TOUR_STEPS} open={showTour} onClose={() => setShowTour(false)} />
 
       {/* Modals */}
       <ComparisonModal

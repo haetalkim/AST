@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { BarChart3, Camera, Download, Filter, Search, Calendar, ChevronDown, TrendingUp, TrendingDown, ChevronRight, Image as ImageIcon, Pencil, X, Upload, Share2, Lock, SlidersHorizontal } from 'lucide-react';
+import { Download, Filter, Search, Calendar, ChevronDown, TrendingUp, TrendingDown, ChevronRight, Image as ImageIcon, Pencil, X, Upload, Share2, Lock, SlidersHorizontal } from 'lucide-react';
 import { addMeasurementEdit, clearWorkspaceMeasurements, getMeasurements, importCsvMeasurements, setSessionVisibility } from '../api/data';
 import {
   clearImportedMeasurements,
@@ -1822,55 +1822,47 @@ const RawDataView = ({
         </div>
       )}
 
-      {/* Help Modal */}
+      {/* Help Modal — plain typography, no icon badges or bullet glyphs; sections are
+          told apart with hairlines and a small-caps label instead. */}
       {showHelpModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={() => setShowHelpModal(false)}>
-          <div className="bg-surface rounded-card max-w-2xl w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="border-b border-hairline-soft p-6 flex items-center justify-between">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={() => setShowHelpModal(false)}>
+          <div className="bg-surface rounded-card max-w-md w-full border border-hairline-soft shadow-lg" onClick={(e) => e.stopPropagation()}>
+            <div className="px-6 pt-6 pb-1 flex items-center justify-between">
               <h3 className="text-tile text-fg">How to use Raw Data</h3>
               <button
                 onClick={() => setShowHelpModal(false)}
-                className="p-1 hover:bg-canvas rounded-ctrl transition-colors"
+                aria-label="Close"
+                className="p-1 -mr-1 text-muted hover:text-fg transition-colors"
               >
-                <X className="w-5 h-5 text-secondary" />
+                <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <h4 className="mb-2 flex items-center gap-2 font-semibold text-fg">
-                  <BarChart3 className="h-4 w-4" aria-hidden="true" />
-                  Viewing Data
-                </h4>
-                <ul className="text-sm text-secondary space-y-1 ml-4">
-                  <li>• Click the <strong>chevron (▶)</strong> to expand rows and see detailed second-by-second sensor data</li>
-                  <li>• Click <strong>location coordinates</strong> to open Google Maps</li>
-                </ul>
+            <div className="px-6 pb-2 divide-y divide-hairline-soft">
+              <div className="py-4">
+                <p className="text-cap font-semibold uppercase tracking-wide text-muted mb-2">Viewing data</p>
+                <div className="text-small text-secondary space-y-1.5">
+                  <p>Click the <strong className="text-fg font-medium">chevron</strong> to expand a row and see second-by-second sensor data.</p>
+                  <p>Click <strong className="text-fg font-medium">location coordinates</strong> to open the spot in Google Maps.</p>
+                </div>
               </div>
-              <div>
-                <h4 className="mb-2 flex items-center gap-2 font-semibold text-fg">
-                  <Pencil className="h-4 w-4" aria-hidden="true" />
-                  Editing Data
-                </h4>
-                <ul className="text-sm text-secondary space-y-1 ml-4">
-                  <li>• <strong>Click any data value</strong> to edit it - edited values show a <span className="font-bold text-orange-600">*</span> badge</li>
-                  <li>• <strong>Click notes</strong> to add context about measurement conditions</li>
-                </ul>
+              <div className="py-4">
+                <p className="text-cap font-semibold uppercase tracking-wide text-muted mb-2">Editing data</p>
+                <div className="text-small text-secondary space-y-1.5">
+                  <p>Click any <strong className="text-fg font-medium">data value</strong> to edit it — edited values are marked with an asterisk.</p>
+                  <p>Click <strong className="text-fg font-medium">notes</strong> to add context about measurement conditions.</p>
+                </div>
               </div>
-              <div>
-                <h4 className="mb-2 flex items-center gap-2 font-semibold text-fg">
-                  <Camera className="h-4 w-4" aria-hidden="true" />
-                  Photos
-                </h4>
-                <ul className="text-sm text-secondary space-y-1 ml-4">
-                  <li>• <strong>Click photos</strong> in expanded rows to view full-size images</li>
-                  <li>• Photos show timestamps automatically</li>
-                  <li>• Use the <strong>Download button</strong> to save photos with timestamp filenames</li>
-                </ul>
+              <div className="py-4">
+                <p className="text-cap font-semibold uppercase tracking-wide text-muted mb-2">Photos</p>
+                <div className="text-small text-secondary space-y-1.5">
+                  <p>Click a <strong className="text-fg font-medium">photo</strong> in an expanded row to view it full-size, complete with its timestamp.</p>
+                  <p>Use <strong className="text-fg font-medium">Download</strong> to save photos with timestamp filenames.</p>
+                </div>
               </div>
             </div>
-            <div className="p-6 border-t border-hairline-soft">
-              <Button wide onClick={() => setShowHelpModal(false)}>
-                Got it!
+            <div className="px-6 pb-6 pt-3 flex justify-end">
+              <Button onClick={() => setShowHelpModal(false)}>
+                Got it
               </Button>
             </div>
           </div>
