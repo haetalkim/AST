@@ -39,6 +39,7 @@ import SaveChartButton from './charts/SaveChartButton';
 import BoxPlot from './charts/BoxPlot';
 import ChartFrame from './charts/ChartFrame';
 import ReflectionPrompt from './charts/ReflectionPrompt';
+import Button from './ui/Button';
 
 /** Shared "good defaults" axis styling: visible axis line + tick line, per the chart-defaults checklist item. */
 const AXIS_STYLE = { fontSize: '12px' };
@@ -53,7 +54,7 @@ const SendToWorkspaceButton = ({ onSendToWorkspace, buildItem, className = '' })
       data-export-hide="true"
       onClick={() => onSendToWorkspace(buildItem())}
       title="Pin this chart to your Workspace tab"
-      className={`inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 shadow-none transition-colors hover:bg-slate-50 ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-ctrl border border-hairline bg-surface px-2.5 py-1.5 text-cap font-semibold text-secondary transition-colors hover:bg-canvas ${className}`}
     >
       <Pin className="h-3.5 w-3.5 shrink-0" strokeWidth={2} aria-hidden="true" />
       <span className="leading-none">Send to Workspace</span>
@@ -210,13 +211,13 @@ const ComparisonModal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl max-w-6xl w-full shadow-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <div className={`${theme.bg} text-white p-6 rounded-t-2xl flex items-center justify-between sticky top-0 z-10`}>
+      <div className="bg-surface rounded-card max-w-6xl w-full shadow-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className={`${theme.bg} text-white p-6 rounded-t-[18px] flex items-center justify-between sticky top-0 z-10`}>
           <div>
-            <h3 className="text-xl font-bold">Compare Data - {metricThemes[selectedMetric].label}</h3>
-            <p className="text-sm opacity-90 mt-1">Compare across groups, schools, locations, and time periods</p>
+            <h3 className="text-tile">Compare data — {metricThemes[selectedMetric].label}</h3>
+            <p className="text-small opacity-90 mt-1">Compare across groups, schools, locations, and time periods</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-ctrl transition-colors">
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -224,7 +225,7 @@ const ComparisonModal = ({
         <div className="p-6">
           {/* Comparison Type Selector */}
           <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-700 mb-3">Comparison Type</label>
+            <label className="block text-small font-semibold text-secondary mb-3">Comparison Type</label>
             <div className="grid grid-cols-4 gap-3">
               {[
                 { id: 'group', label: 'By Group', Icon: Users },
@@ -235,10 +236,10 @@ const ComparisonModal = ({
                 <button
                   key={type.id}
                   onClick={() => setComparisonType(type.id)}
-                  className={`p-4 rounded-xl text-sm font-medium transition-all ${
+                  className={`p-4 rounded-card text-small font-medium transition-all ${
                     comparisonType === type.id
-                      ? `${theme.bg} text-white shadow-lg`
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ? `${theme.bg} text-white`
+                      : 'bg-canvas text-secondary hover:bg-hairline-soft'
                   }`}
                 >
                   <type.Icon className="mx-auto mb-2 h-6 w-6" aria-hidden="true" />
@@ -249,70 +250,70 @@ const ComparisonModal = ({
           </div>
 
           {/* Selection Panel */}
-          <div className="mb-6 bg-gray-50 rounded-xl p-4">
+          <div className="mb-6 bg-canvas rounded-card p-4">
             {comparisonType === 'group' && (
               <div>
-                <h4 className="text-sm font-semibold text-gray-700 mb-3">Select Groups to Compare</h4>
+                <h4 className="text-small font-semibold text-secondary mb-3">Select Groups to Compare</h4>
                 <div className="flex flex-wrap gap-2">
                   {groupButtonList.map((group) => (
                     <button
                       key={group}
                       onClick={() => toggleGroupSelection(group)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      className={`px-4 py-2 rounded-ctrl text-small font-medium transition-all ${
                         selectedGroups.includes(group)
                           ? `${theme.bg} text-white`
-                          : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
+                          : 'bg-surface text-secondary border border-hairline hover:bg-canvas'
                       }`}
                     >
                       Group {group.replace('G', '')}
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-gray-500 mt-2">Currently viewing: {currentFilters.school} - Your group is G{currentFilters.group.replace('G', '')}</p>
+                <p className="text-cap text-muted mt-2">Currently viewing: {currentFilters.school} - Your group is G{currentFilters.group.replace('G', '')}</p>
               </div>
             )}
 
             {comparisonType === 'school' && (
               <div>
-                <h4 className="text-sm font-semibold text-gray-700 mb-3">Select Schools to Compare</h4>
+                <h4 className="text-small font-semibold text-secondary mb-3">Select Schools to Compare</h4>
                 <div className="flex flex-wrap gap-2">
                   {schoolChipList.map((school) => (
                     <button
                       key={school}
                       onClick={() => toggleSchoolSelection(school)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      className={`px-4 py-2 rounded-ctrl text-small font-medium transition-all ${
                         selectedSchools.includes(school)
                           ? `${theme.bg} text-white`
-                          : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
+                          : 'bg-surface text-secondary border border-hairline hover:bg-canvas'
                       }`}
                     >
                       {school}
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-gray-500 mt-2">Your school: {currentFilters.school}</p>
+                <p className="text-cap text-muted mt-2">Your school: {currentFilters.school}</p>
               </div>
             )}
 
             {comparisonType === 'location' && (
               <div>
-                <h4 className="text-sm font-semibold text-gray-700 mb-3">Select Locations to Compare</h4>
+                <h4 className="text-small font-semibold text-secondary mb-3">Select Locations to Compare</h4>
                 <div className="flex flex-wrap gap-2">
                   {REFERENCE_LOCATIONS.map((ref) => (
                     <button
                       key={ref.name}
                       onClick={() => toggleLocationSelection(ref.name)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      className={`px-4 py-2 rounded-ctrl text-small font-medium transition-all ${
                         selectedLocations.includes(ref.name)
                           ? `${theme.bg} text-white`
-                          : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
+                          : 'bg-surface text-secondary border border-hairline hover:bg-canvas'
                       }`}
                     >
                       {ref.name}
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-cap text-muted mt-2">
                   Curves use the same Philadelphia, New York, and Hanoi city references as Analysis.
                 </p>
               </div>
@@ -320,16 +321,16 @@ const ComparisonModal = ({
 
             {comparisonType === 'time' && (
               <div>
-                <h4 className="text-sm font-semibold text-gray-700 mb-3">Select Time Period</h4>
+                <h4 className="text-small font-semibold text-secondary mb-3">Select Time Period</h4>
                 <div className="flex gap-2">
                   {['week', 'month', 'year'].map(period => (
                     <button
                       key={period}
                       onClick={() => setTimeRange(period)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      className={`px-4 py-2 rounded-ctrl text-small font-medium transition-all ${
                         timeRange === period
                           ? `${theme.bg} text-white`
-                          : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
+                          : 'bg-surface text-secondary border border-hairline hover:bg-canvas'
                       }`}
                     >
                       {period.charAt(0).toUpperCase() + period.slice(1)}
@@ -341,23 +342,23 @@ const ComparisonModal = ({
           </div>
 
           {(comparisonType === 'group' || comparisonType === 'school') && (
-            <p className="mb-4 text-sm text-gray-600 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3">
+            <p className="mb-4 text-small text-secondary rounded-ctrl border border-blue-100 bg-blue-50 px-4 py-3">
               Weekday averages from measurements already loaded in this session (your imported CSV / synced
               workspace data) — not a live query of other schools' private data. Cross-school crowdsourced
               comparisons need a shared-visibility decision from the team first.
             </p>
           )}
           {comparisonType === 'time' && (
-            <p className="mb-4 text-sm text-gray-600 rounded-lg border border-amber-100 bg-amber-50 px-4 py-3">
+            <p className="mb-4 text-small text-secondary rounded-ctrl border border-amber-100 bg-amber-50 px-4 py-3">
               Time-period comparisons are not wired to real data yet. Use <strong>By Location</strong>,{' '}
               <strong>By Group</strong>, or <strong>By School</strong> instead.
             </p>
           )}
 
           {/* Comparison Chart */}
-          <div ref={comparisonChartRef} className="bg-white rounded-xl p-6 border-2 border-gray-200 mb-6">
+          <div ref={comparisonChartRef} className="bg-surface rounded-card p-6 border border-hairline-soft mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h4 className="text-lg font-semibold text-gray-900">Comparison Visualization</h4>
+              <h4 className="text-tile text-fg">Comparison Visualization</h4>
               {comparisonData.length > 0 && (
                 <SaveChartButton
                   targetRef={comparisonChartRef}
@@ -366,7 +367,7 @@ const ComparisonModal = ({
               )}
             </div>
             {comparisonData.length === 0 ? (
-              <div className="flex h-[400px] items-center justify-center text-center text-sm text-gray-500 px-6">
+              <div className="flex h-[400px] items-center justify-center text-center text-small text-muted px-6">
                 {comparisonType === 'location'
                   ? 'Select at least one city above to plot reference trends.'
                   : comparisonType === 'time'
@@ -411,24 +412,24 @@ const ComparisonModal = ({
           </div>
 
           {/* Comparison Statistics Table */}
-          <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden">
-            <h4 className="text-lg font-semibold text-gray-900 p-4 border-b border-gray-200">Statistical Comparison</h4>
+          <div className="bg-surface rounded-card border border-hairline-soft overflow-hidden">
+            <h4 className="text-tile text-fg p-4 border-b border-hairline-soft">Statistical Comparison</h4>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-canvas">
                   <tr>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Name</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Average</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Min</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Max</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Range</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Trend</th>
+                    <th className="px-4 py-3 text-left text-small font-semibold text-secondary">Name</th>
+                    <th className="px-4 py-3 text-left text-small font-semibold text-secondary">Average</th>
+                    <th className="px-4 py-3 text-left text-small font-semibold text-secondary">Min</th>
+                    <th className="px-4 py-3 text-left text-small font-semibold text-secondary">Max</th>
+                    <th className="px-4 py-3 text-left text-small font-semibold text-secondary">Range</th>
+                    <th className="px-4 py-3 text-left text-small font-semibold text-secondary">Trend</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-hairline-soft">
                   {comparisonData.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-4 py-8 text-center text-sm text-gray-500">
+                      <td colSpan={6} className="px-4 py-8 text-center text-small text-muted">
                         No comparison rows. Choose locations (reference series) or another view with real data.
                       </td>
                     </tr>
@@ -440,28 +441,28 @@ const ComparisonModal = ({
                         item.values[item.values.length - 1] > item.values[0] ? 'increasing' : 'decreasing';
 
                       return (
-                        <tr key={idx} className="hover:bg-gray-50">
+                        <tr key={idx} className="hover:bg-canvas">
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-2">
                               <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                              <span className="font-medium text-gray-900">{item.name}</span>
+                              <span className="font-medium text-fg">{item.name}</span>
                             </div>
                           </td>
-                          <td className="px-4 py-3 text-gray-900 font-semibold">{item.avg}</td>
+                          <td className="px-4 py-3 text-fg font-semibold">{item.avg}</td>
                           <td className="px-4 py-3 text-green-600 font-semibold">{min}</td>
                           <td className="px-4 py-3 text-orange-600 font-semibold">{max}</td>
-                          <td className="px-4 py-3 text-gray-700">{max - min}</td>
+                          <td className="px-4 py-3 text-secondary">{max - min}</td>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-1">
                               {trend === 'increasing' ? (
                                 <>
                                   <TrendingUp className="w-4 h-4 text-orange-600" />
-                                  <span className="text-sm text-orange-600 font-medium">Rising</span>
+                                  <span className="text-small text-orange-600 font-medium">Rising</span>
                                 </>
                               ) : (
                                 <>
                                   <TrendingDown className="w-4 h-4 text-green-600" />
-                                  <span className="text-sm text-green-600 font-medium">Falling</span>
+                                  <span className="text-small text-green-600 font-medium">Falling</span>
                                 </>
                               )}
                             </div>
@@ -477,12 +478,12 @@ const ComparisonModal = ({
 
           {/* Key Insights */}
           {comparisonData.length > 0 && (
-            <div className="mt-6 bg-blue-50 rounded-xl p-4 border border-blue-200">
+            <div className="mt-6 bg-blue-50 rounded-card p-4 border border-blue-200">
               <h4 className="mb-2 flex items-center gap-2 font-semibold text-blue-900">
                 <Lightbulb className="h-4 w-4" aria-hidden="true" />
                 Key Insights
               </h4>
-              <ul className="text-sm text-blue-800 space-y-1">
+              <ul className="text-small text-blue-800 space-y-1">
                 <li>
                   • Highest average:{' '}
                   <strong>
@@ -943,123 +944,121 @@ const AnalysisView = ({
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Analysis Dashboard</h1>
-        <p className="text-gray-600">Statistical analysis and trends</p>
-      </div>
-
-      {/* View Tabs */}
-      <div className="bg-white rounded-2xl p-2 shadow-lg border border-gray-200 inline-flex">
-        <button
-          onClick={() => setActiveTab('overview')}
-          className={`flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-all ${
-            activeTab === 'overview'
-              ? `${theme.bg} text-white shadow-md`
-              : 'text-gray-600 hover:bg-gray-100'
-          }`}
-        >
-          <BarChart3 className="h-4 w-4" aria-hidden="true" />
-          Overview
-        </button>
-        <button
-          onClick={() => setActiveTab('compare')}
-          className={`flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-all ${
-            activeTab === 'compare'
-              ? `${theme.bg} text-white shadow-md`
-              : 'text-gray-600 hover:bg-gray-100'
-          }`}
-        >
-          <GitCompareArrows className="h-4 w-4" aria-hidden="true" />
-          Compare Data
-        </button>
+      {/* Header + view tabs */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-page text-fg">Analysis</h1>
+        <div className="seg inline-flex rounded-pill border border-hairline bg-surface p-[3px] gap-0.5">
+          <button
+            onClick={() => setActiveTab('overview')}
+            aria-pressed={activeTab === 'overview'}
+            className={`flex items-center gap-2 px-4 h-9 rounded-pill text-small transition-all ${
+              activeTab === 'overview' ? 'bg-fg text-white' : 'text-secondary hover:bg-canvas'
+            }`}
+          >
+            <BarChart3 className="h-4 w-4" aria-hidden="true" />
+            Overview
+          </button>
+          <button
+            onClick={() => setActiveTab('compare')}
+            aria-pressed={activeTab === 'compare'}
+            className={`flex items-center gap-2 px-4 h-9 rounded-pill text-small transition-all ${
+              activeTab === 'compare' ? 'bg-fg text-white' : 'text-secondary hover:bg-canvas'
+            }`}
+          >
+            <GitCompareArrows className="h-4 w-4" aria-hidden="true" />
+            Compare Data
+          </button>
+        </div>
       </div>
 
       {/* Compact sticky context + section rail. It replaces the large metric card and keeps
           navigation available without adding another page-level tab row. */}
       {(hasData || isTeacher) && (
-        <div
-          className="sticky top-20 z-30 flex flex-wrap items-center gap-1.5 rounded-xl border bg-white/95 px-3 py-2 shadow-md backdrop-blur"
-          style={{ borderColor: theme.primary }}
-        >
-          {Object.entries(metricThemes).map(([key, metric]) => (
-            <button
-              key={key}
-              onClick={() => setSelectedMetric(key)}
-              className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors ${
-                selectedMetric === key ? `${metric.bg} text-white` : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              {metric.label}
-            </button>
-          ))}
-          <div className="mx-1 hidden h-6 w-px bg-gray-200 md:block" />
-          {hasData && hasHealthThreshold(selectedMetric) && (
-            <span
-              className="px-2 py-0.5 rounded-full text-[11px] font-bold"
-              style={{ backgroundColor: getColorForValue(avgValue, selectedMetric), color: '#1F2937' }}
-            >
-              Avg: {getStatusLabel(avgValue, selectedMetric)}
-            </span>
-          )}
-          {isTeacher && (
-            <div className="ml-auto flex flex-wrap items-center gap-3">
-              <label className="relative z-20 flex items-center gap-1.5 text-[11px] font-semibold text-gray-600">
-                <span className="shrink-0">Period</span>
-                <select
-                  value={focusPeriod}
-                  onChange={(e) => {
-                    setFocusPeriod(e.target.value);
-                    setFocusGroup('all');
-                  }}
-                  className="min-w-[7.5rem] rounded-lg border border-gray-300 bg-white px-2 py-1 text-xs font-semibold text-gray-800"
-                  aria-label="Focus period for analysis"
-                >
-                  <option value="all">All periods</option>
-                  {focusPeriodOptions.map((period) => (
-                    <option key={period} value={period}>{period}</option>
-                  ))}
-                </select>
-              </label>
-              <label className="relative z-20 flex items-center gap-1.5 text-[11px] font-semibold text-gray-600">
-                <span className="shrink-0">Group</span>
-                <select
-                  value={focusGroup}
-                  onChange={(e) => setFocusGroup(e.target.value)}
-                  className="min-w-[7.5rem] rounded-lg border border-gray-300 bg-white px-2 py-1 text-xs font-semibold text-gray-800"
-                  aria-label="Focus group for analysis"
-                >
-                  <option value="all">All groups</option>
-                  {focusGroupOptions.map((group) => (
-                    <option key={group} value={group}>{group}</option>
-                  ))}
-                </select>
-              </label>
-            </div>
-          )}
+        <div className="filters sticky top-20 z-30 rounded-card border border-hairline-soft bg-surface/95 px-3 py-2.5 backdrop-blur space-y-2">
+          <div className="frow flex flex-wrap items-center gap-2">
+            {Object.entries(metricThemes).map(([key, metric]) => (
+              <button
+                key={key}
+                onClick={() => setSelectedMetric(key)}
+                className={`chip h-8 px-3.5 rounded-pill text-small border transition-colors ${
+                  selectedMetric === key
+                    ? `${metric.bg} text-white border-transparent`
+                    : 'bg-surface text-secondary border-hairline hover:bg-canvas'
+                }`}
+              >
+                {metric.label}
+              </button>
+            ))}
+            {hasData && hasHealthThreshold(selectedMetric) && (
+              <span
+                className="badge inline-flex items-center gap-1.5 h-8 px-3 rounded-pill text-cap font-semibold"
+                style={{ backgroundColor: getColorForValue(avgValue, selectedMetric), color: '#1F2937' }}
+              >
+                Avg: {getStatusLabel(avgValue, selectedMetric)}
+              </span>
+            )}
+            {isTeacher && (
+              <div className="ml-auto flex flex-wrap items-center gap-3">
+                <label className="relative z-20 flex items-center gap-1.5 text-small text-secondary">
+                  <span className="flabel shrink-0">Period</span>
+                  <select
+                    value={focusPeriod}
+                    onChange={(e) => {
+                      setFocusPeriod(e.target.value);
+                      setFocusGroup('all');
+                    }}
+                    className="sel-sm min-w-[7.5rem] h-9 rounded-ctrl border border-hairline bg-surface px-2.5 text-small text-fg"
+                    aria-label="Focus period for analysis"
+                  >
+                    <option value="all">All periods</option>
+                    {focusPeriodOptions.map((period) => (
+                      <option key={period} value={period}>{period}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="relative z-20 flex items-center gap-1.5 text-small text-secondary">
+                  <span className="flabel shrink-0">Group</span>
+                  <select
+                    value={focusGroup}
+                    onChange={(e) => setFocusGroup(e.target.value)}
+                    className="sel-sm min-w-[7.5rem] h-9 rounded-ctrl border border-hairline bg-surface px-2.5 text-small text-fg"
+                    aria-label="Focus group for analysis"
+                  >
+                    <option value="all">All groups</option>
+                    {focusGroupOptions.map((group) => (
+                      <option key={group} value={group}>{group}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            )}
+          </div>
           {activeTab === 'overview' && hasData && (
-            <div className={`flex min-w-0 flex-wrap gap-1 ${isTeacher ? 'w-full justify-end pt-1 md:w-auto md:pt-0' : 'flex-1 justify-end'}`}>
-              {[
-                ['recent', 'Recent'],
-                ['trends', 'Trends'],
-                ['distribution', 'Distribution'],
-                ['box', 'Box plot'],
-                ['scatter', 'Scatter'],
-                ['insights', 'Insights'],
-              ].map(([key, label]) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => toggleSection(key)}
-                  aria-expanded={openSections[key]}
-                  className={`flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-semibold ${
-                    openSections[key] ? 'bg-slate-800 text-white' : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  {label}
-                  <ChevronDown className={`h-3 w-3 transition-transform ${openSections[key] ? 'rotate-180' : ''}`} />
-                </button>
-              ))}
+            <div className="frow flex flex-wrap items-center gap-1.5">
+              <span className="flabel text-small text-muted shrink-0">View</span>
+              <div className="segwide flex flex-wrap gap-1 rounded-pill border border-hairline bg-canvas p-1">
+                {[
+                  ['recent', 'Recent'],
+                  ['trends', 'Trends'],
+                  ['distribution', 'Distribution'],
+                  ['box', 'Box plot'],
+                  ['scatter', 'Scatter'],
+                  ['insights', 'Insights'],
+                ].map(([key, label]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => toggleSection(key)}
+                    aria-expanded={openSections[key]}
+                    className={`flex items-center gap-1 rounded-pill px-2.5 h-7 text-cap font-semibold transition-colors ${
+                      openSections[key] ? 'bg-fg text-white' : 'text-secondary hover:bg-surface'
+                    }`}
+                  >
+                    {label}
+                    <ChevronDown className={`h-3 w-3 transition-transform ${openSections[key] ? 'rotate-180' : ''}`} />
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -1067,16 +1066,16 @@ const AnalysisView = ({
 
       {/* Conditional Content based on Active Tab */}
       {!hasData ? (
-        <div className="bg-white rounded-2xl p-12 shadow-lg border border-gray-200 text-center max-w-2xl mx-auto">
-          <div className="mx-auto w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-            <MapPin className="w-8 h-8 text-slate-400" />
+        <div className="bg-surface rounded-card p-12 border border-hairline-soft text-center max-w-2xl mx-auto">
+          <div className="mx-auto w-16 h-16 bg-canvas rounded-full flex items-center justify-center mb-4">
+            <MapPin className="w-8 h-8 text-muted" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">No data for Analysis yet</h2>
-          <p className="text-gray-600 mb-4">
+          <h2 className="text-tile text-fg mb-2">No data for Analysis yet</h2>
+          <p className="text-secondary mb-4">
             With your current filters, there are no measurements. Collect sessions in the field or import CSV on{' '}
             <strong>Raw Data</strong>, then come back here.
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-small text-muted">
             We no longer show placeholder charts — the Analysis page only uses <strong>your</strong> workspace data.
             When you have data, you can compare it to Philadelphia, New York, or Hanoi reference trends.
           </p>
@@ -1084,7 +1083,7 @@ const AnalysisView = ({
       ) : activeTab === 'overview' ? (
         <>
           {/* One thin summary strip instead of four oversized cards. */}
-          <div className="flex flex-wrap items-center divide-x divide-gray-200 rounded-xl border bg-white px-2 py-2 shadow-sm">
+          <div className="flex flex-wrap items-center divide-x divide-hairline-soft rounded-card border border-hairline-soft bg-surface px-2 py-2">
             {[
               ['Average', avgValue, theme.primary],
               ['Median', Math.round(medianValue), '#9333EA'],
@@ -1092,9 +1091,9 @@ const AnalysisView = ({
               ['Maximum', Math.round(maxValue), '#EA580C'],
             ].map(([label, value, color]) => (
               <div key={label} className="flex min-w-[130px] flex-1 items-baseline justify-between gap-2 px-4 py-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500">{label}</span>
+                <span className="text-cap font-bold uppercase tracking-wider text-muted">{label}</span>
                 <span className="text-lg font-bold" style={{ color }}>
-                  {value} <span className="text-[10px] font-medium text-gray-400">{metricThemes[selectedMetric].unit}</span>
+                  {value} <span className="text-cap font-medium text-muted">{metricThemes[selectedMetric].unit}</span>
                 </span>
               </div>
             ))}
@@ -1102,12 +1101,12 @@ const AnalysisView = ({
 
       {/* Outlier / surprising-reading callouts */}
       {dailyOutliers.length > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+        <div className="bg-amber-50 border border-amber-200 rounded-card p-4">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="w-4 h-4 text-amber-600" />
-            <h3 className="text-sm font-bold text-amber-900">Surprising readings to investigate</h3>
+            <h3 className="text-small font-bold text-amber-900">Surprising readings to investigate</h3>
           </div>
-          <ul className="text-sm text-amber-800 space-y-1">
+          <ul className="text-small text-amber-800 space-y-1">
             {dailyOutliers.slice(0, 5).map((o, idx) => (
               <li key={idx}>
                 • <strong>{o.point.date}</strong>: {o.value} {metricThemes[selectedMetric].unit} — unusually{' '}
@@ -1115,7 +1114,7 @@ const AnalysisView = ({
               </li>
             ))}
           </ul>
-          <p className="text-xs text-amber-700 mt-2">
+          <p className="text-cap text-amber-700 mt-2">
             Flagged using the 1.5×IQR rule — a starting point for discussion, not a definitive error.
           </p>
         </div>
@@ -1124,10 +1123,10 @@ const AnalysisView = ({
       {/* Charts Grid — your recent week vs reference; your full series */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {openSections.recent && (
-        <div ref={weekChartRef} className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+        <div ref={weekChartRef} className="bg-surface rounded-card p-6 border border-hairline-soft">
           <div className="mb-3 flex items-start justify-between gap-3">
             <div className="flex min-w-0 items-start gap-2">
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-tile text-fg">
                 Recent week vs {referenceLocation} ({metricThemes[selectedMetric].label})
               </h2>
               <div className="relative">
@@ -1137,7 +1136,7 @@ const AnalysisView = ({
                   aria-expanded={showReferenceInfo}
                   aria-controls="reference-comparison-info"
                   onClick={() => setShowReferenceInfo((visible) => !visible)}
-                  className="mt-0.5 rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+                  className="mt-0.5 rounded-full p-1 text-muted hover:bg-canvas hover:text-secondary"
                 >
                   <Info className="h-4 w-4" />
                 </button>
@@ -1145,7 +1144,7 @@ const AnalysisView = ({
                   <div
                     id="reference-comparison-info"
                     role="note"
-                    className="absolute left-0 top-8 z-20 w-72 rounded-lg border border-gray-200 bg-white p-3 text-xs leading-relaxed text-gray-600 shadow-xl"
+                    className="absolute left-0 top-8 z-20 w-72 rounded-ctrl border border-hairline-soft bg-surface p-3 text-cap leading-relaxed text-secondary shadow-xl"
                   >
                     <strong>Your data</strong> uses the current measurement filters. The reference line uses OpenAQ daily
                     averages when a matching sensor exists; otherwise it shows a simulated regional curve.
@@ -1177,14 +1176,14 @@ const AnalysisView = ({
               />
             </div>
           </div>
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-t border-gray-100 pt-3" data-export-hide="true">
-            <label className="flex items-center gap-2 text-xs font-medium text-gray-600">
-              <MapPin className="h-4 w-4 shrink-0 text-gray-500" aria-hidden="true" />
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-t border-hairline-soft pt-3" data-export-hide="true">
+            <label className="flex items-center gap-2 text-cap font-medium text-secondary">
+              <MapPin className="h-4 w-4 shrink-0 text-muted" aria-hidden="true" />
               <span className="shrink-0">Reference location</span>
               <select
                 value={referenceLocation}
                 onChange={(e) => setReferenceLocation(e.target.value)}
-                className="h-9 max-w-[220px] rounded-lg border border-gray-300 bg-white px-3 text-sm leading-normal text-gray-800"
+                className="h-9 max-w-[220px] rounded-ctrl border border-hairline bg-surface px-3 text-small leading-normal text-fg"
               >
                 {REFERENCE_LOCATIONS.map((loc) => (
                   <option key={loc.name} value={loc.name}>
@@ -1194,13 +1193,13 @@ const AnalysisView = ({
               </select>
             </label>
             {OPENAQ_REFERENCE_METRICS.includes(selectedMetric) && openaqMeta.status === 'loading' && (
-              <p className="text-xs text-blue-600">Loading OpenAQ reference…</p>
+              <p className="text-cap text-blue-600">Loading OpenAQ reference…</p>
             )}
             {OPENAQ_REFERENCE_METRICS.includes(selectedMetric) && openaqMeta.status === 'ok' && (
-              <p className="text-xs text-green-700">{openaqMeta.message}</p>
+              <p className="text-cap text-green-700">{openaqMeta.message}</p>
             )}
             {OPENAQ_REFERENCE_METRICS.includes(selectedMetric) && openaqMeta.status === 'error' && (
-              <p className="text-xs text-amber-700">{openaqMeta.message}</p>
+              <p className="text-cap text-amber-700">{openaqMeta.message}</p>
             )}
           </div>
           {weekCompareData.length ? (
@@ -1251,16 +1250,16 @@ const AnalysisView = ({
               </ResponsiveContainer>
             </ChartFrame>
           ) : (
-            <p className="text-sm text-gray-500 py-8 text-center">Not enough dated points in this filter for a week chart.</p>
+            <p className="text-small text-muted py-8 text-center">Not enough dated points in this filter for a week chart.</p>
           )}
           <ReflectionPrompt storageKey={`week-vs-ref-${selectedMetric}`} mode="notice-wonder" />
         </div>
         )}
 
         {openSections.trends && (
-        <div ref={monthChartRef} className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+        <div ref={monthChartRef} className="bg-surface rounded-card p-6 border border-hairline-soft">
           <div className="flex items-start justify-between gap-3 mb-1">
-            <h2 className="text-lg font-semibold text-gray-900">Your measurements over time</h2>
+            <h2 className="text-tile text-fg">Your measurements over time</h2>
             <div className="flex items-center gap-1.5" data-export-hide="true">
               <SaveChartButton
                 targetRef={monthChartRef}
@@ -1281,7 +1280,7 @@ const AnalysisView = ({
               />
             </div>
           </div>
-          <p className="text-xs text-gray-500 mb-4">Daily average for the selected metric (all days in your current filter).</p>
+          <p className="text-cap text-muted mb-4">Daily average for the selected metric (all days in your current filter).</p>
           {monthData.length >= 2 ? (
             <ChartFrame height={260} xLabel="Date" yLabel={metricThemes[selectedMetric].unit}>
               <ResponsiveContainer width="100%" height="100%">
@@ -1317,7 +1316,7 @@ const AnalysisView = ({
               </ResponsiveContainer>
             </ChartFrame>
           ) : (
-            <p className="text-sm text-gray-500 py-12 text-center">
+            <p className="text-small text-muted py-12 text-center">
               Add more days of data (or relax filters) to see a time series.
             </p>
           )}
@@ -1327,11 +1326,11 @@ const AnalysisView = ({
 
       {/* Distribution Analysis */}
       {openSections.distribution && (
-      <div ref={distributionChartRef} className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+      <div ref={distributionChartRef} className="bg-surface rounded-card p-6 border border-hairline-soft">
         <div className="flex items-start justify-between gap-3 mb-2">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Value Distribution</h2>
-            <p className="text-xs text-gray-500">
+            <h2 className="text-tile text-fg">Value Distribution</h2>
+            <p className="text-cap text-muted">
               How your {metricThemes[selectedMetric].label} readings ({metricThemes[selectedMetric].unit}) spread across ranges.
             </p>
           </div>
@@ -1398,11 +1397,11 @@ const AnalysisView = ({
 
       {/* Box Plot — variability/distribution per team in the current class period */}
       {openSections.box && (
-      <div ref={boxPlotRef} className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+      <div ref={boxPlotRef} className="bg-surface rounded-card p-6 border border-hairline-soft">
         <div className="flex items-start justify-between gap-3 mb-4">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Variability by team (box plot)</h2>
-            <p className="text-xs text-gray-500">
+            <h2 className="text-tile text-fg">Variability by team (box plot)</h2>
+            <p className="text-cap text-muted">
               Min / Q1 / median / Q3 / max of {metricThemes[selectedMetric].label} for each team in your class period.
             </p>
           </div>
@@ -1432,20 +1431,20 @@ const AnalysisView = ({
 
       {/* Bivariate / scatter — relationship between two variables */}
       {openSections.scatter && (
-      <div ref={scatterChartRef} className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+      <div ref={scatterChartRef} className="bg-surface rounded-card p-6 border border-hairline-soft">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-tile text-fg">
               {metricThemes[selectedMetric].label} vs {metricThemes[scatterMetric].label}
             </h2>
-            <p className="text-xs text-gray-500">Each point is one measurement, colored by team.</p>
+            <p className="text-cap text-muted">Each point is one measurement, colored by team.</p>
           </div>
           <div className="flex shrink-0 items-center gap-2" data-export-hide="true">
-            <span className="text-xs font-semibold text-gray-500">Compare with:</span>
+            <span className="text-cap font-semibold text-muted">Compare with:</span>
             <select
               value={scatterMetric}
               onChange={(e) => setScatterMetric(e.target.value)}
-              className="h-9 rounded-lg border border-gray-300 bg-white px-3 text-sm leading-normal"
+              className="h-9 rounded-ctrl border border-hairline bg-surface px-3 text-small leading-normal"
             >
               {Object.entries(metricThemes)
                 .filter(([key]) => key !== selectedMetric)
@@ -1508,7 +1507,7 @@ const AnalysisView = ({
             </ResponsiveContainer>
           </ChartFrame>
         ) : (
-          <p className="text-sm text-gray-500 py-12 text-center">Not enough matching data points for a scatter plot yet.</p>
+          <p className="text-small text-muted py-12 text-center">Not enough matching data points for a scatter plot yet.</p>
         )}
         <ReflectionPrompt storageKey={`scatter-${selectedMetric}-${scatterMetric}`} mode="cer" />
       </div>
@@ -1517,20 +1516,20 @@ const AnalysisView = ({
       {/* Summary Insights */}
       {openSections.insights && (
       <div 
-        className="rounded-2xl p-8 shadow-lg border-2"
+        className="rounded-card p-8 border"
         style={{ 
           background: `linear-gradient(135deg, ${theme.light} 0%, white 100%)`,
           borderColor: theme.primary
         }}
       >
-        <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-gray-900">
+        <h2 className="mb-4 flex items-center gap-2 text-tile text-fg">
           <Lightbulb className="h-5 w-5" aria-hidden="true" />
           Key Insights
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Statistical Summary:</h3>
-            <ul className="space-y-2 text-sm text-gray-600">
+            <h3 className="text-small font-semibold text-secondary mb-3">Statistical Summary:</h3>
+            <ul className="space-y-2 text-small text-secondary">
               <li className="flex items-start gap-2">
                 <span style={{ color: theme.primary }}>•</span>
                 <span>Average {metricThemes[selectedMetric].label} is <strong>{avgValue} {metricThemes[selectedMetric].unit}</strong></span>
@@ -1556,8 +1555,8 @@ const AnalysisView = ({
             </ul>
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Observations:</h3>
-            <ul className="space-y-2 text-sm text-gray-600">
+            <h3 className="text-small font-semibold text-secondary mb-3">Observations:</h3>
+            <ul className="space-y-2 text-small text-secondary">
               <li className="flex items-start gap-2">
                 <Check className="mt-0.5 h-4 w-4 flex-none text-green-600" aria-hidden="true" />
                 <span>Data collected over {allValues.length} time points</span>
@@ -1583,54 +1582,54 @@ const AnalysisView = ({
           {/* Quick Comparison Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Your Group */}
-            <div className={`bg-white rounded-2xl p-6 shadow-lg border-2`} style={{ borderColor: theme.primary }}>
+            <div className={`bg-surface rounded-card p-6 border`} style={{ borderColor: theme.primary }}>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-gray-900">Your Group</h3>
-                <span className={`px-3 py-1 ${theme.bg} text-white text-sm font-semibold rounded-full`}>
+                <h3 className="text-tile text-fg">Your Group</h3>
+                <span className={`px-3 py-1 ${theme.bg} text-white text-small font-semibold rounded-pill`}>
                   G{filters.group.replace('G', '')}
                 </span>
               </div>
               <div className="mb-4">
                 <p className="text-4xl font-bold mb-1" style={{ color: theme.primary }}>{avgValue}</p>
-                <p className="text-sm text-gray-600">{metricThemes[selectedMetric].unit}</p>
+                <p className="text-small text-secondary">{metricThemes[selectedMetric].unit}</p>
               </div>
-              <div className="space-y-2 text-sm">
+              <div className="space-y-2 text-small">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Min</span>
+                  <span className="text-secondary">Min</span>
                   <span className="font-semibold text-green-600">{Math.round(minValue)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Max</span>
+                  <span className="text-secondary">Max</span>
                   <span className="font-semibold text-orange-600">{Math.round(maxValue)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Range</span>
-                  <span className="font-semibold text-gray-900">{Math.round(maxValue - minValue)}</span>
+                  <span className="text-secondary">Range</span>
+                  <span className="font-semibold text-fg">{Math.round(maxValue - minValue)}</span>
                 </div>
               </div>
             </div>
 
             {/* Class Average */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-purple-200">
+            <div className="bg-surface rounded-card p-6 border border-purple-200">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-gray-900">Class Average</h3>
-                <span className="px-3 py-1 bg-purple-100 text-purple-700 text-sm font-semibold rounded-full">
+                <h3 className="text-tile text-fg">Class Average</h3>
+                <span className="px-3 py-1 bg-purple-100 text-purple-700 text-small font-semibold rounded-pill">
                   All Groups
                 </span>
               </div>
               <div className="mb-4">
                 <p className="text-4xl font-bold text-purple-600 mb-1">{classAverage ?? 'NO DATA'}</p>
                 {classAverage != null && (
-                  <p className="text-sm text-gray-600">{metricThemes[selectedMetric].unit}</p>
+                  <p className="text-small text-secondary">{metricThemes[selectedMetric].unit}</p>
                 )}
               </div>
-              <div className="space-y-2 text-sm">
-                <p className="text-xs text-gray-500">
+              <div className="space-y-2 text-small">
+                <p className="text-cap text-muted">
                   Average across all groups in your class period (same school + period in imported data).
                 </p>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">vs your group</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="text-secondary">vs your group</span>
+                  <span className="font-semibold text-fg">
                     {classAverage != null
                       ? avgValue <= classAverage
                         ? `${Math.abs(avgValue - classAverage)} lower`
@@ -1642,26 +1641,26 @@ const AnalysisView = ({
             </div>
 
             {/* School Average */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-blue-200">
+            <div className="bg-surface rounded-card p-6 border border-blue-200">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-gray-900">School Average</h3>
-                <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-semibold rounded-full">
+                <h3 className="text-tile text-fg">School Average</h3>
+                <span className="px-3 py-1 bg-blue-100 text-blue-700 text-small font-semibold rounded-pill">
                   {filters.school}
                 </span>
               </div>
               <div className="mb-4">
                 <p className="text-4xl font-bold text-blue-600 mb-1">{schoolAverage ?? 'NO DATA'}</p>
                 {schoolAverage != null && (
-                  <p className="text-sm text-gray-600">{metricThemes[selectedMetric].unit}</p>
+                  <p className="text-small text-secondary">{metricThemes[selectedMetric].unit}</p>
                 )}
               </div>
-              <div className="space-y-2 text-sm">
-                <p className="text-xs text-gray-500">
+              <div className="space-y-2 text-small">
+                <p className="text-cap text-muted">
                   Average for your school code across imported rows (all classes/groups in file).
                 </p>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">vs your group</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="text-secondary">vs your group</span>
+                  <span className="font-semibold text-fg">
                     {schoolAverage != null
                       ? avgValue <= schoolAverage
                         ? `${Math.abs(avgValue - schoolAverage)} lower`
@@ -1674,11 +1673,11 @@ const AnalysisView = ({
           </div>
 
           {/* Comparison Chart */}
-          <div ref={quickCompareChartRef} className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+          <div ref={quickCompareChartRef} className="bg-surface rounded-card p-6 border border-hairline-soft">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">Your recent week comparison</h3>
-                <p className="text-xs text-gray-500">
+                <h3 className="text-tile text-fg mb-1">Your recent week comparison</h3>
+                <p className="text-cap text-muted">
                   Compare your filtered data with OpenAQ, another group, class average, or school average.
                 </p>
               </div>
@@ -1686,7 +1685,7 @@ const AnalysisView = ({
                 <select
                   value={compareMode}
                   onChange={(e) => setCompareMode(e.target.value)}
-                  className="h-9 rounded-lg border border-gray-300 bg-white px-3 text-sm leading-normal"
+                  className="sel-sm h-9 rounded-ctrl border border-hairline bg-surface px-3 text-small leading-normal"
                 >
                   <option value="openaq">vs OpenAQ reference</option>
                   <option value="group">vs another group</option>
@@ -1697,7 +1696,7 @@ const AnalysisView = ({
                   <select
                     value={compareGroup}
                     onChange={(e) => setCompareGroup(e.target.value)}
-                    className="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white"
+                    className="sel-sm h-9 text-small border border-hairline rounded-ctrl px-3 bg-surface"
                   >
                     {availableCompareGroups.length ? (
                       availableCompareGroups.map((g) => (
@@ -1791,9 +1790,9 @@ const AnalysisView = ({
 
           {/* Insights */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-gradient-to-br from-green-50 to-white rounded-2xl p-6 shadow-lg border border-green-200">
-              <h3 className="text-lg font-bold text-gray-900 mb-3">Quick read</h3>
-              <ul className="space-y-2 text-sm text-gray-700">
+            <div className="bg-gradient-to-br from-green-50 to-white rounded-card p-6 border border-green-200">
+              <h3 className="text-tile text-fg mb-3">Quick read</h3>
+              <ul className="space-y-2 text-small text-secondary">
                 <li className="flex items-start gap-2">
                   <span className="text-green-600 mt-0.5">•</span>
                   <span>
@@ -1811,9 +1810,9 @@ const AnalysisView = ({
               </ul>
             </div>
 
-            <div className="bg-gradient-to-br from-blue-50 to-white rounded-2xl p-6 shadow-lg border border-blue-200">
-              <h3 className="text-lg font-bold text-gray-900 mb-3">Compare further</h3>
-              <ul className="space-y-2 text-sm text-gray-700">
+            <div className="bg-gradient-to-br from-blue-50 to-white rounded-card p-6 border border-blue-200">
+              <h3 className="text-tile text-fg mb-3">Compare further</h3>
+              <ul className="space-y-2 text-small text-secondary">
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 mt-0.5">•</span>
                   <span>
@@ -1829,19 +1828,16 @@ const AnalysisView = ({
           </div>
 
           {/* CTA for Full Comparison */}
-          <div className={`bg-gradient-to-r ${theme.bg} ${theme.hover} rounded-2xl p-6 text-white shadow-lg`}>
+          <div className={`bg-gradient-to-r ${theme.bg} ${theme.hover} rounded-card p-6 text-white`}>
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-bold mb-2">Want to explore more comparisons?</h3>
-                <p className="text-sm opacity-90">Compare with other schools, locations, and time periods</p>
+                <h3 className="text-tile mb-2">Want to explore more comparisons?</h3>
+                <p className="text-small opacity-90">Compare with other schools, locations, and time periods</p>
               </div>
-              <button
-                onClick={() => setShowCompareModal(true)}
-                className="flex items-center gap-2 px-6 py-3 bg-white text-gray-900 font-semibold rounded-lg hover:bg-gray-100 transition-all shadow-md"
-              >
+              <Button variant="neutral" onClick={() => setShowCompareModal(true)}>
                 <GitCompareArrows className="h-4 w-4" aria-hidden="true" />
                 Open detailed comparison
-              </button>
+              </Button>
             </div>
           </div>
         </div>
