@@ -73,6 +73,45 @@ const LandingPage = ({ onLogin, onRegister, onGoogleLogin, authError, authLoadin
     return () => clearInterval(typeTimer);
   }, []);
 
+  // "Keep scrolling" shouldn't just jump — a brief held stall, then an eased release
+  // into motion that settles rather than snapping to a stop.
+  const handleScrollToDevice = (e) => {
+    e.preventDefault();
+    const target = document.getElementById('device-section');
+    if (!target) return;
+
+    const reduceMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      target.scrollIntoView({ block: 'start' });
+      return;
+    }
+
+    const startY = window.scrollY;
+    const targetY = target.getBoundingClientRect().top + startY - 12;
+    const distance = targetY - startY;
+    if (Math.abs(distance) < 4) return;
+
+    const stallMs = 150;
+    const durationMs = 820;
+    const easeOutQuint = (t) => 1 - Math.pow(1 - t, 5);
+    const startTime = performance.now();
+
+    const step = (now) => {
+      const elapsed = now - startTime - stallMs;
+      if (elapsed < 0) {
+        requestAnimationFrame(step);
+        return;
+      }
+      const t = Math.min(1, elapsed / durationMs);
+      window.scrollTo(0, startY + distance * easeOutQuint(t));
+      if (t < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+
   const handleLoginAttempt = () => {
     if (isSignUp) {
       if (fullName.trim().length < 2) {
@@ -265,6 +304,7 @@ const LandingPage = ({ onLogin, onRegister, onGoogleLogin, authError, authLoadin
         <div className="flex justify-center pb-12">
           <a
             href="#device-section"
+            onClick={handleScrollToDevice}
             className="inline-flex flex-col items-center gap-2.5 px-6 py-3 rounded-card hover:bg-white/70 transition-colors"
           >
             <span className="text-cap tracking-wide uppercase text-muted">Keep scrolling</span>
