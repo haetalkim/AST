@@ -8,6 +8,7 @@ import AnalysisView from "./components/AnalysisView";
 import WorkspaceView, { followAttachedNotes } from "./components/WorkspaceView";
 import MyPage from "./components/MyPage";
 import ManageClasses from "./components/ManageClasses";
+import Avatar from "./components/ui/Avatar";
 import { MapPin, Table, BarChart3, User, LogOut, Users, LayoutGrid, Globe2, GraduationCap } from "lucide-react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
@@ -724,21 +725,6 @@ export default function App() {
     return "WS";
   };
 
-  const teacherNavInitials = () => {
-    const name = (viewerProfile.displayName || "").trim();
-    const parts = name.split(/\s+/).filter(Boolean);
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    }
-    if (parts.length === 1 && parts[0].length >= 2) {
-      return parts[0].slice(0, 2).toUpperCase();
-    }
-    if (parts.length === 1 && parts[0].length === 1) {
-      return `${parts[0]}•`.toUpperCase();
-    }
-    return "IN";
-  };
-
   const navItems = isTeacher
     ? [
         { id: 'manageclasses', label: 'Manage Classes', icon: Users },
@@ -975,24 +961,7 @@ export default function App() {
                         : `Group ${(viewerProfile.group || filters.group || "").replace("G", "") || "—"}`}
                     </p>
                   </div>
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center border-2 border-white shadow-md shrink-0">
-                    <span className="text-white text-sm font-semibold">
-                      {isTeacher
-                        ? teacherNavInitials()
-                        : (() => {
-                            const name = (viewerProfile.displayName || "").trim();
-                            const parts = name.split(/\s+/).filter(Boolean);
-                            if (parts.length >= 2) {
-                              return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-                            }
-                            if (parts.length === 1 && parts[0].length >= 2) {
-                              return parts[0].slice(0, 2).toUpperCase();
-                            }
-                            const code = viewerProfile.studentId || filters.studentId || "ST";
-                            return code.slice(0, 2).toUpperCase();
-                          })()}
-                    </span>
-                  </div>
+                  <Avatar size="sm" className="border-2 border-white shadow-md" />
                 </>
               )}
               <button

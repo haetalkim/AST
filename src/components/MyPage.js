@@ -6,6 +6,7 @@ import { periodsFromClassStructure } from '../utils/classStructure';
 import SchoolCombobox from './SchoolCombobox';
 import Button from './ui/Button';
 import Card from './ui/Card';
+import Avatar from './ui/Avatar';
 
 const MyPage = ({
   workspaceId,
@@ -41,14 +42,6 @@ const MyPage = ({
   const [schoolError, setSchoolError] = useState('');
   const [schoolSaved, setSchoolSaved] = useState(false);
   const [schoolOptions, setSchoolOptions] = useState([]);
-
-  const profileInitials = () => {
-    const name = (viewerProfile.displayName || me?.user?.full_name || '').trim();
-    const parts = name.split(/\s+/).filter(Boolean);
-    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    if (parts.length === 1 && parts[0].length >= 2) return parts[0].slice(0, 2).toUpperCase();
-    return isTeacherRole ? 'IN' : 'ST';
-  };
 
   useEffect(() => {
     let cancelled = false;
@@ -259,9 +252,7 @@ const MyPage = ({
         {/* Profile Card */}
         <div className="space-y-6">
           <Card className="text-center">
-            <div className="w-22 h-22 mx-auto rounded-full flex items-center justify-center text-3xl font-semibold bg-fg text-on-primary mb-4" style={{ width: 88, height: 88 }}>
-              {profileInitials()}
-            </div>
+            <Avatar className="mx-auto mb-4" style={{ width: 88, height: 88 }} />
             <h2 className="text-tile text-fg">
               {isTeacherRole
                 ? viewerProfile.displayName || me?.user?.full_name || 'Instructor'
@@ -525,9 +516,7 @@ const MyPage = ({
                     <div className="space-y-2">
                       {groupedStructure[bucket].map((member, idx) => (
                         <div key={`${bucket}-${idx}`} className="flex items-center gap-3 p-3 hover:bg-canvas rounded-ctrl transition-colors">
-                          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-fg text-on-primary font-semibold text-small">
-                            {member.name.charAt(0)}
-                          </div>
+                          <Avatar size="sm" />
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-fg truncate">{member.name}</p>
                             <p className="text-small text-secondary">{member.role}</p>
