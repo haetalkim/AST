@@ -386,6 +386,21 @@
   opacity: 1 !important;
 }
 
+/* Same "what's next" nudge as the sim card, aimed at the PM 2.5 sensor itself — a soft
+   glow pulse rather than a label, since the part already has its own hover tooltip. */
+#abc-root .abc-part[data-id="pm25"].next-step-nudge .glow-target {
+  animation: next-step-glow 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) 2;
+}
+@keyframes next-step-glow {
+  0%, 100% { filter: none; }
+  50% { filter: drop-shadow(0 0 9px rgba(0, 113, 227, 0.6)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #abc-root .abc-part[data-id="pm25"].next-step-nudge .glow-target {
+    animation: none;
+  }
+}
+
 /* Lightweight hover identification — a tooltip that follows the cursor, no panel change. */
 .abc-part-tooltip {
   position: absolute;
@@ -550,10 +565,45 @@
    the rest of the app's global stylesheet.
    ============================================================ */
 #sim-block .simcard {
+  position: relative;
   background: var(--surface);
   border: 1px solid var(--hairline-soft);
   border-radius: var(--r-card);
   padding: 18px 20px;
+}
+
+/* One-time "what's next" nudge: airflow is on but neither the walk scenario nor the
+   Plantower cutaway has been tried yet — gently point at both entry points. Mirrors
+   the #abc-btn-air.airflow-nudge treatment above so the two guides feel like one system. */
+#sim-block .simcard.next-step-nudge {
+  animation: next-step-card-pulse 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) 2;
+}
+#sim-block .simcard.next-step-nudge::after {
+  content: "Try this next";
+  position: absolute;
+  top: -13px;
+  right: 16px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  color: #515154;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: airflow-nudge-label 3.9s ease forwards;
+}
+@keyframes next-step-card-pulse {
+  0%, 100% { box-shadow: none; }
+  50% { box-shadow: 0 0 0 5px rgba(0, 113, 227, 0.14); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #sim-block .simcard.next-step-nudge,
+  #sim-block .simcard.next-step-nudge::after {
+    animation: none;
+  }
 }
 
 #sim-block .t-small {

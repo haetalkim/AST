@@ -80,6 +80,39 @@ export function initDeviceExplorer() {
   let particles    = [];
   let airflowNudgeShown = false;
   let airflowNudgeTimer = null;
+  // "What's next" guidance: airflow first, then either the Plantower cutaway or the walk
+  // scenario — whichever the visitor tries first. Each nudge fires once per session.
+  let plantowerVisited   = false;
+  let nextStepNudgeShown = false;
+  let nextStepNudgeTimer = null;
+
+  function clearNextStepNudge() {
+    if (nextStepNudgeTimer) {
+      window.clearTimeout(nextStepNudgeTimer);
+      nextStepNudgeTimer = null;
+    }
+    const pm25Part = root.querySelector('.abc-part[data-id="pm25"]');
+    const simCard = document.getElementById("sim-card");
+    if (pm25Part) pm25Part.classList.remove("next-step-nudge");
+    if (simCard) simCard.classList.remove("next-step-nudge");
+  }
+
+  function maybeNudgeNextStep() {
+    if (nextStepNudgeShown || plantowerVisited || window.AIRSTORY_SCENARIO_ENGAGED) return;
+    nextStepNudgeShown = true;
+    nextStepNudgeTimer = window.setTimeout(() => {
+      nextStepNudgeTimer = null;
+      if (!airflowOn || currentView !== "top" || plantowerVisited || window.AIRSTORY_SCENARIO_ENGAGED) return;
+      const pm25Part = root.querySelector('.abc-part[data-id="pm25"]');
+      const simCard = document.getElementById("sim-card");
+      if (pm25Part) pm25Part.classList.add("next-step-nudge");
+      if (simCard) simCard.classList.add("next-step-nudge");
+      window.setTimeout(() => {
+        if (pm25Part) pm25Part.classList.remove("next-step-nudge");
+        if (simCard) simCard.classList.remove("next-step-nudge");
+      }, 3900);
+    }, 1100);
+  }
 
   const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -167,6 +200,10 @@ export function initDeviceExplorer() {
     lookInsideBtn.style.display = "none";
     updateAirflow();
 
+    // Plantower has been found — the "look inside or try the walk" nudge no longer applies.
+    plantowerVisited = true;
+    clearNextStepNudge();
+
     // One gentle nudge per page load: after entering Plantower, point out airflow once.
     if (!airflowNudgeShown && !airflowOn && btnAir) {
       airflowNudgeShown = true;
@@ -211,6 +248,12 @@ export function initDeviceExplorer() {
     }
     updateAirflow();
     document.dispatchEvent(new CustomEvent('airstory:airflow', { detail: { on: airflowOn, view: currentView } }));
+
+    // Airflow just turned on with nothing else tried yet — point at the next step
+    // (Plantower or the walk scenario). Airflow always comes first, so this only ever
+    // fires once it's actually on.
+    if (airflowOn) maybeNudgeNextStep();
+    else clearNextStepNudge();
   }
 
   function updateAirflow() {
@@ -527,6 +570,16 @@ export function initSensorWalk() {
   const startBtn = document.getElementById('sim-start');
   if (!stopsEl || !playBtn || !simCard) return;
 
+  // Lets the main sensor controller know the visitor has actually engaged the walk
+  // (not just that airflow auto-revealed the gate), so it stops nudging toward it.
+  function markScenarioEngaged() {
+    if (window.AIRSTORY_SCENARIO_ENGAGED) return;
+    window.AIRSTORY_SCENARIO_ENGAGED = true;
+    const pm25Part = document.querySelector('.abc-part[data-id="pm25"]');
+    if (pm25Part) pm25Part.classList.remove('next-step-nudge');
+    if (simCard) simCard.classList.remove('next-step-nudge');
+  }
+
   let scenarioUnlocked = false;
   function unlockScenario() {
     if (scenarioUnlocked) return;
@@ -586,12 +639,14 @@ export function initSensorWalk() {
     if (!scenarioUnlocked) return;
     const b = e.target.closest('button');
     if (!b) return;
+    markScenarioEngaged();
     if (playing) { clearInterval(playing); playing = null; playBtn.textContent = 'Play the whole walk'; }
     select(parseInt(b.dataset.i, 10));
   });
 
   playBtn.addEventListener('click', () => {
     if (!scenarioUnlocked) return;
+    markScenarioEngaged();
     if (playing) {
       clearInterval(playing);
       playing = null;
