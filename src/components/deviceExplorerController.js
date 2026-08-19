@@ -139,6 +139,7 @@ export function initDeviceExplorer() {
     root.classList.remove("has-active");
     root.querySelectorAll(".abc-part").forEach(p => p.classList.remove("active"));
     detailEl.style.display = "none";
+    defaultEl.style.display = "flex";
     if (hintEl) hintEl.style.display = "";
     hidePartTip();
   }

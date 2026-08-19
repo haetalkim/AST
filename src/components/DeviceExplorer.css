@@ -233,8 +233,9 @@
   pointer-events: none;
 }
 
-/* Narrative occupies negative space next to the diagram rather than a documentation card —
-   it stays invisible until a part is deliberately selected. */
+/* Narrative occupies negative space next to the diagram rather than a documentation card.
+   It's always present (a short credit line by default) so this side of the stage never
+   reads as empty, then swaps to the selected part's story once one is chosen. */
 #abc-panel {
   align-self: center;
   width: auto;
@@ -248,15 +249,6 @@
   box-shadow: none;
   display: flex;
   flex-direction: column;
-  opacity: 0;
-  transform: translateY(8px);
-  pointer-events: none;
-  transition: opacity 0.28s ease, transform 0.42s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-#abc-root.has-active #abc-panel {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
 }
 @media (max-width: 900px) {
   #abc-panel {
@@ -265,10 +257,44 @@
   }
 }
 
-/* There is no persistent default documentation state — the hint text below the
-   diagram already tells first-time visitors what to do. */
+/* Default state: a short, quiet credit line — same typographic scale as the selected-part
+   story below, so the panel never feels blank before a part is picked. */
 #abc-default {
-  display: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: abc-panel-fade 0.32s ease;
+}
+#abc-default-badge {
+  align-self: flex-start;
+  color: #6e6e73;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.01em;
+  font-weight: 500;
+}
+#abc-default-title {
+  font-size: 28px;
+  line-height: 32px;
+  letter-spacing: -0.5px;
+  font-weight: 600;
+  color: #1d1d1f;
+  max-width: 280px;
+}
+#abc-default-body {
+  font-size: 15px;
+  line-height: 22px;
+  color: #6e6e73;
+  max-width: 280px;
+}
+@keyframes abc-panel-fade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #abc-default {
+    animation: none;
+  }
 }
 
 #abc-detail {
@@ -276,6 +302,12 @@
   flex-direction: column;
   gap: 14px;
   min-height: 0;
+  animation: abc-panel-fade 0.32s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  #abc-detail {
+    animation: none;
+  }
 }
 
 #abc-badge {

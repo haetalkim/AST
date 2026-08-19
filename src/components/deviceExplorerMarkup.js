@@ -339,14 +339,9 @@ const deviceExplorerMarkup = `
     </div>
       <div id="abc-panel">
         <div id="abc-default">
-          <div class="abc-default-title">AirStory</div>
-          <div class="abc-default-sub">V1.0 · Tamgu Lab</div>
-          <div class="abc-default-body">A palm-sized air quality sensor. Hover any part to see what it does.</div>
-          <div class="abc-default-hint-label">Try this:</div>
-          <div class="abc-default-hints">
-            <div>• Tap <b>Show airflow</b> to watch the air move</div>
-            <div>• Hover the blue Plantower box and tap <b>Look inside</b></div>
-          </div>
+          <div id="abc-default-badge">AirStory Sensor</div>
+          <div id="abc-default-title">A palm-sized air quality sensor.</div>
+          <div id="abc-default-body">Developed by Tamgu Lab @ Teachers College. Hover or tap a part to see how it works.</div>
         </div>
         <div id="abc-detail">
           <div id="abc-badge"></div>
