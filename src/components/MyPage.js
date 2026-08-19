@@ -480,14 +480,10 @@ const MyPage = ({
 
           {/* Group Members */}
           <Card>
-            <div className="flex items-center gap-3 mb-6">
-              <div className={`w-10 h-10 ${theme.bg} rounded-ctrl flex items-center justify-center`}>
-                <User className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-tile text-fg">
-                {(userRole === 'teacher') ? 'Class Members' : 'Group Members'}
-              </h3>
-            </div>
+            <h3 className="flex items-center gap-2 text-tile text-fg mb-6">
+              <User className="w-5 h-5 text-muted" aria-hidden="true" />
+              {(userRole === 'teacher') ? 'Class Members' : 'Group Members'}
+            </h3>
 
             {/* Instructor */}
             <div className="mb-6 pb-6 border-b border-hairline-soft">

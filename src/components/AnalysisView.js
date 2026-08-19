@@ -996,68 +996,79 @@ const AnalysisView = ({
                 Avg: {getStatusLabel(avgValue, selectedMetric)}
               </span>
             )}
-            {isTeacher && (
-              <div className="ml-auto flex flex-wrap items-center gap-3">
-                <label className="relative z-20 flex items-center gap-1.5 text-small text-secondary">
-                  <span className="flabel shrink-0">Period</span>
-                  <select
-                    value={focusPeriod}
-                    onChange={(e) => {
-                      setFocusPeriod(e.target.value);
-                      setFocusGroup('all');
-                    }}
-                    className="sel-sm min-w-[7.5rem] h-9 rounded-ctrl border border-hairline bg-surface px-2.5 text-small text-fg"
-                    aria-label="Focus period for analysis"
-                  >
-                    <option value="all">All periods</option>
-                    {focusPeriodOptions.map((period) => (
-                      <option key={period} value={period}>{period}</option>
-                    ))}
-                  </select>
-                </label>
-                <label className="relative z-20 flex items-center gap-1.5 text-small text-secondary">
-                  <span className="flabel shrink-0">Group</span>
-                  <select
-                    value={focusGroup}
-                    onChange={(e) => setFocusGroup(e.target.value)}
-                    className="sel-sm min-w-[7.5rem] h-9 rounded-ctrl border border-hairline bg-surface px-2.5 text-small text-fg"
-                    aria-label="Focus group for analysis"
-                  >
-                    <option value="all">All groups</option>
-                    {focusGroupOptions.map((group) => (
-                      <option key={group} value={group}>{group}</option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-            )}
           </div>
-          {activeTab === 'overview' && hasData && (
-            <div className="frow flex flex-wrap items-center gap-1.5">
-              <span className="flabel text-small text-muted shrink-0">View</span>
-              <div className="segwide flex flex-wrap gap-1 rounded-pill border border-hairline bg-canvas p-1">
-                {[
-                  ['recent', 'Recent'],
-                  ['trends', 'Trends'],
-                  ['distribution', 'Distribution'],
-                  ['box', 'Box plot'],
-                  ['scatter', 'Scatter'],
-                  ['insights', 'Insights'],
-                ].map(([key, label]) => (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => toggleSection(key)}
-                    aria-expanded={openSections[key]}
-                    className={`flex items-center gap-1 rounded-pill px-2.5 h-7 text-cap font-semibold transition-colors ${
-                      openSections[key] ? 'bg-fg text-white' : 'text-secondary hover:bg-surface'
-                    }`}
-                  >
-                    {label}
-                    <ChevronDown className={`h-3 w-3 transition-transform ${openSections[key] ? 'rotate-180' : ''}`} />
-                  </button>
-                ))}
-              </div>
+          {/* Second row: how you're viewing the data (sections) and, for teachers, which
+              period/group to focus on — grouped together since both narrow what's shown,
+              separated from the "what metric" row above. */}
+          {(isTeacher || (activeTab === 'overview' && hasData)) && (
+            <div className="frow flex flex-wrap items-center gap-3">
+              {activeTab === 'overview' && hasData && (
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="flabel text-small text-muted shrink-0">View</span>
+                  <div className="segwide flex flex-wrap gap-1 rounded-pill border border-hairline bg-canvas p-1">
+                    {[
+                      ['recent', 'Recent'],
+                      ['trends', 'Trends'],
+                      ['distribution', 'Distribution'],
+                      ['box', 'Box plot'],
+                      ['scatter', 'Scatter'],
+                      ['insights', 'Insights'],
+                    ].map(([key, label]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => toggleSection(key)}
+                        aria-expanded={openSections[key]}
+                        className={`flex items-center gap-1 rounded-pill px-2.5 h-7 text-cap font-semibold transition-colors ${
+                          openSections[key] ? 'bg-fg text-white' : 'text-secondary hover:bg-surface'
+                        }`}
+                      >
+                        {label}
+                        <ChevronDown className={`h-3 w-3 transition-transform ${openSections[key] ? 'rotate-180' : ''}`} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {isTeacher && (
+                <div
+                  className={`ml-auto flex flex-wrap items-center gap-3 ${
+                    activeTab === 'overview' && hasData ? 'pl-3 border-l border-hairline-soft' : ''
+                  }`}
+                >
+                  <label className="relative z-20 flex items-center gap-1.5 text-small text-secondary">
+                    <span className="flabel shrink-0">Period</span>
+                    <select
+                      value={focusPeriod}
+                      onChange={(e) => {
+                        setFocusPeriod(e.target.value);
+                        setFocusGroup('all');
+                      }}
+                      className="sel-sm min-w-[7.5rem] h-9 rounded-ctrl border border-hairline bg-surface px-2.5 text-small text-fg"
+                      aria-label="Focus period for analysis"
+                    >
+                      <option value="all">All periods</option>
+                      {focusPeriodOptions.map((period) => (
+                        <option key={period} value={period}>{period}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="relative z-20 flex items-center gap-1.5 text-small text-secondary">
+                    <span className="flabel shrink-0">Group</span>
+                    <select
+                      value={focusGroup}
+                      onChange={(e) => setFocusGroup(e.target.value)}
+                      className="sel-sm min-w-[7.5rem] h-9 rounded-ctrl border border-hairline bg-surface px-2.5 text-small text-fg"
+                      aria-label="Focus group for analysis"
+                    >
+                      <option value="all">All groups</option>
+                      {focusGroupOptions.map((group) => (
+                        <option key={group} value={group}>{group}</option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -1576,27 +1587,30 @@ const AnalysisView = ({
         /* Quick Compare View */
         <div className="space-y-6">
           {/* Quick Comparison Cards */}
+          {/* Three parallel comparison cards — same neutral treatment for all three (no
+              per-card rainbow of purple/blue borders and badges); only your own group's
+              number uses the one chromatic accent, since it's the thing being compared against. */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Your Group */}
-            <div className={`bg-surface rounded-card p-6 border`} style={{ borderColor: theme.primary }}>
+            <div className="bg-surface rounded-card p-6 border border-hairline-soft">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-tile text-fg">Your Group</h3>
-                <span className={`px-3 py-1 ${theme.bg} text-white text-small font-semibold rounded-pill`}>
+                <span className="px-2.5 py-1 bg-canvas border border-hairline text-secondary text-cap font-semibold rounded-pill">
                   G{filters.group.replace('G', '')}
                 </span>
               </div>
               <div className="mb-4">
-                <p className="text-4xl font-bold mb-1" style={{ color: theme.primary }}>{avgValue}</p>
+                <p className="text-4xl font-semibold mb-1" style={{ color: theme.primary }}>{avgValue}</p>
                 <p className="text-small text-secondary">{metricThemes[selectedMetric].unit}</p>
               </div>
               <div className="space-y-2 text-small">
                 <div className="flex justify-between">
                   <span className="text-secondary">Min</span>
-                  <span className="font-semibold text-green-600">{Math.round(minValue)}</span>
+                  <span className="font-semibold text-fg">{Math.round(minValue)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-secondary">Max</span>
-                  <span className="font-semibold text-orange-600">{Math.round(maxValue)}</span>
+                  <span className="font-semibold text-fg">{Math.round(maxValue)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-secondary">Range</span>
@@ -1606,15 +1620,15 @@ const AnalysisView = ({
             </div>
 
             {/* Class Average */}
-            <div className="bg-surface rounded-card p-6 border border-purple-200">
+            <div className="bg-surface rounded-card p-6 border border-hairline-soft">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-tile text-fg">Class Average</h3>
-                <span className="px-3 py-1 bg-purple-100 text-purple-700 text-small font-semibold rounded-pill">
+                <span className="px-2.5 py-1 bg-canvas border border-hairline text-secondary text-cap font-semibold rounded-pill">
                   All Groups
                 </span>
               </div>
               <div className="mb-4">
-                <p className="text-4xl font-bold text-purple-600 mb-1">{classAverage ?? 'NO DATA'}</p>
+                <p className="text-4xl font-semibold text-fg mb-1">{classAverage ?? 'No data'}</p>
                 {classAverage != null && (
                   <p className="text-small text-secondary">{metricThemes[selectedMetric].unit}</p>
                 )}
@@ -1630,22 +1644,22 @@ const AnalysisView = ({
                       ? avgValue <= classAverage
                         ? `${Math.abs(avgValue - classAverage)} lower`
                         : `${Math.abs(avgValue - classAverage)} higher`
-                      : 'NO DATA'}
+                      : 'No data'}
                   </span>
                 </div>
               </div>
             </div>
 
             {/* School Average */}
-            <div className="bg-surface rounded-card p-6 border border-blue-200">
+            <div className="bg-surface rounded-card p-6 border border-hairline-soft">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-tile text-fg">School Average</h3>
-                <span className="px-3 py-1 bg-blue-100 text-blue-700 text-small font-semibold rounded-pill">
+                <span className="px-2.5 py-1 bg-canvas border border-hairline text-secondary text-cap font-semibold rounded-pill">
                   {filters.school}
                 </span>
               </div>
               <div className="mb-4">
-                <p className="text-4xl font-bold text-blue-600 mb-1">{schoolAverage ?? 'NO DATA'}</p>
+                <p className="text-4xl font-semibold text-fg mb-1">{schoolAverage ?? 'No data'}</p>
                 {schoolAverage != null && (
                   <p className="text-small text-secondary">{metricThemes[selectedMetric].unit}</p>
                 )}
@@ -1661,7 +1675,7 @@ const AnalysisView = ({
                       ? avgValue <= schoolAverage
                         ? `${Math.abs(avgValue - schoolAverage)} lower`
                         : `${Math.abs(avgValue - schoolAverage)} higher`
-                      : 'NO DATA'}
+                      : 'No data'}
                   </span>
                 </div>
               </div>

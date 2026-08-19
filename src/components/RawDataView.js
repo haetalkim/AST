@@ -1092,19 +1092,22 @@ const RawDataView = ({
             )}
           </div>
 
-          {/* Apply / Clear */}
-          <button
-            onClick={applyFilters}
-            className="chip on inline-flex items-center h-8 px-3.5 text-small rounded-pill bg-fg text-white border border-fg"
-          >
-            Apply
-          </button>
-          <button
-            onClick={clearFilters}
-            className="chip inline-flex items-center h-8 px-3.5 text-small rounded-pill border border-hairline text-secondary bg-surface hover:bg-canvas"
-          >
-            Clear
-          </button>
+          {/* Apply / Clear — grouped as one unit so they wrap together instead of splitting
+              across lines, and pushed to the end of the toolbar as the row's actions. */}
+          <div className="flex items-center gap-2 ml-auto shrink-0">
+            <button
+              onClick={clearFilters}
+              className="chip inline-flex items-center h-8 px-3.5 text-small rounded-pill border border-hairline text-secondary bg-surface hover:bg-canvas"
+            >
+              Clear
+            </button>
+            <button
+              onClick={applyFilters}
+              className="chip on inline-flex items-center h-8 px-3.5 text-small rounded-pill bg-fg text-white border border-fg"
+            >
+              Apply
+            </button>
+          </div>
 
           {scopeTab === 'school' && (
             <span className="text-small text-muted w-full md:w-auto">All sessions across {viewerIdentity.school}.</span>
