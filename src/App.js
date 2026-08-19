@@ -1099,6 +1099,9 @@ export default function App() {
             onProfileSaved={syncFromMe}
             focusSchoolSignal={schoolFocusNonce}
             schoolEditable={isTeacher && currentWorkspaceKind === "class"}
+            memberships={memberships}
+            switchWorkspace={switchWorkspace}
+            workspaceFullName={workspaceFullName}
           />
         )}
         {activeSection === 'manageclasses' && isTeacher && (

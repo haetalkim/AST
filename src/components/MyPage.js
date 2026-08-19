@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { User, HelpCircle, Shield, LogOut, Edit2, Save, X } from 'lucide-react';
+import { User, Edit2, Save, X } from 'lucide-react';
 import { getMe, getRoster, changePassword, updateMyProfile, setWorkspaceSchool } from '../api/auth';
 import { getSchools } from '../api/schools';
 import { periodsFromClassStructure } from '../utils/classStructure';
@@ -19,6 +19,9 @@ const MyPage = ({
   onProfileSaved,
   focusSchoolSignal = 0,
   schoolEditable = false, // teacher of a class workspace: the school is a per-class setting
+  memberships = [],
+  switchWorkspace,
+  workspaceFullName,
 }) => {
   const isTeacherRole = userRole === 'teacher';
   const [isEditing, setIsEditing] = useState(false);
@@ -252,14 +255,11 @@ const MyPage = ({
         <h1 className="text-page text-fg">My page</h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-6 items-start">
         {/* Profile Card */}
-        <div className="lg:col-span-1 space-y-6">
+        <div className="space-y-6">
           <Card className="text-center">
-            <div
-              className="w-24 h-24 mx-auto rounded-full flex items-center justify-center text-3xl font-semibold text-white mb-4"
-              style={{ background: `linear-gradient(135deg, ${theme.primary} 0%, ${theme.primary}CC 100%)` }}
-            >
+            <div className="w-22 h-22 mx-auto rounded-full flex items-center justify-center text-3xl font-semibold bg-fg text-on-primary mb-4" style={{ width: 88, height: 88 }}>
               {profileInitials()}
             </div>
             <h2 className="text-tile text-fg">
@@ -320,21 +320,15 @@ const MyPage = ({
           <Card>
             <h3 className="text-tile text-fg mb-4">Quick actions</h3>
             <div className="space-y-2">
-              <button className="w-full flex items-center gap-3 px-4 py-3 text-left text-secondary hover:bg-canvas rounded-ctrl transition-colors">
-                <HelpCircle className="w-5 h-5 text-muted" />
-                <span className="text-small font-medium">Help & Support</span>
-              </button>
-              <button className="w-full flex items-center gap-3 px-4 py-3 text-left text-secondary hover:bg-canvas rounded-ctrl transition-colors">
-                <Shield className="w-5 h-5 text-muted" />
-                <span className="text-small font-medium">Privacy Settings</span>
-              </button>
-              <button
-                onClick={onLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 text-left text-aqi-unhealthy hover:bg-canvas rounded-ctrl transition-colors"
-              >
-                <LogOut className="w-5 h-5" />
-                <span className="text-small font-medium">Sign Out</span>
-              </button>
+              <Button variant="neutral" size="sm" wide className="justify-start">
+                Help and support
+              </Button>
+              <Button variant="neutral" size="sm" wide className="justify-start">
+                Privacy settings
+              </Button>
+              <Button variant="danger" size="sm" wide className="justify-start" onClick={onLogout}>
+                Sign out
+              </Button>
             </div>
           </Card>
 
@@ -359,7 +353,7 @@ const MyPage = ({
         </div>
 
         {/* Settings Sections */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6">
           {/* Account Settings */}
           <Card>
             <h3 className="text-tile text-fg">Account</h3>
@@ -453,6 +447,46 @@ const MyPage = ({
             </div>
           </Card>
 
+          {/* Your workspaces */}
+          {memberships.length > 0 && (
+            <Card>
+              <h3 className="text-tile text-fg">Your workspaces</h3>
+              <p className="text-small text-muted mt-1">Switch between the classes and views you belong to.</p>
+              <div className="tablewrap border border-hairline-soft rounded-card overflow-hidden mt-4">
+                <table className="w-full text-small">
+                  <tbody className="divide-y divide-hairline-soft">
+                    {memberships.map((m) => {
+                      const active = m.workspace_id === workspaceId;
+                      const name = workspaceFullName ? workspaceFullName(m) : m.workspace_name || 'Workspace';
+                      const roleLabel = m.role === 'teacher' ? 'Instructor' : 'Student';
+                      const placement = [m.profile?.period, m.profile?.group_code].filter(Boolean).join(' · ');
+                      return (
+                        <tr key={m.workspace_id} className={active ? 'bg-canvas' : undefined}>
+                          <td className="py-3 px-3.5">
+                            <button
+                              type="button"
+                              onClick={() => switchWorkspace?.(m.workspace_id)}
+                              disabled={active}
+                              className={`font-medium ${active ? 'text-fg cursor-default' : 'text-link hover:underline'}`}
+                            >
+                              {name}
+                            </button>
+                            {placement ? <div className="text-cap text-muted mt-0.5">{placement}</div> : null}
+                          </td>
+                          <td className="py-3 px-3.5 text-right">
+                            <span className="tag inline-block px-2.5 py-0.5 text-cap rounded-pill bg-canvas text-secondary border border-hairline">
+                              {roleLabel}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          )}
+
           {/* Group Members */}
           <Card>
             <div className="flex items-center gap-3 mb-6">
@@ -491,10 +525,7 @@ const MyPage = ({
                     <div className="space-y-2">
                       {groupedStructure[bucket].map((member, idx) => (
                         <div key={`${bucket}-${idx}`} className="flex items-center gap-3 p-3 hover:bg-canvas rounded-ctrl transition-colors">
-                          <div 
-                            className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-small"
-                            style={{ background: `linear-gradient(135deg, ${theme.primary} 0%, ${theme.primary}CC 100%)` }}
-                          >
+                          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-fg text-on-primary font-semibold text-small">
                             {member.name.charAt(0)}
                           </div>
                           <div className="flex-1 min-w-0">
