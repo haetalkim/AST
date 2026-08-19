@@ -841,9 +841,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Slack-style vertical workspace switcher */}
+      {/* Vertical workspace switcher — quiet neutral rail, not a colorful SaaS-style dock. */}
       {!isPublicMode && memberships.length > 0 && (
-        <aside className="sticky top-0 h-screen w-20 shrink-0 bg-slate-900 flex flex-col items-center gap-3 py-4 overflow-y-auto z-50">
+        <aside className="sticky top-0 h-screen w-20 shrink-0 bg-canvas border-r border-hairline flex flex-col items-center gap-3 py-4 overflow-y-auto z-50">
           {memberships.map((m) => {
             const active = m.workspace_id === workspaceId;
             return (
@@ -874,10 +874,10 @@ export default function App() {
                 onBlur={() => setWorkspaceTooltip(null)}
               >
                 <span
-                  className={`flex items-center justify-center w-12 h-12 rounded-full text-sm font-bold transition-all ${
+                  className={`flex items-center justify-center w-11 h-11 rounded-full border text-small font-semibold transition-colors ${
                     active
-                      ? "bg-blue-600 text-white ring-2 ring-white shadow-lg"
-                      : "bg-slate-700 text-slate-100 hover:bg-blue-600"
+                      ? "bg-fg text-on-primary border-fg"
+                      : "bg-surface text-secondary border-hairline hover:border-fg hover:text-fg"
                   }`}
                 >
                   {workspaceIcon(m)}
@@ -891,7 +891,7 @@ export default function App() {
       {/* Sidebar hover tooltip — fixed so it escapes the rail's scroll clipping. */}
       {workspaceTooltip && (
         <span
-          className="pointer-events-none fixed z-[100] -translate-y-1/2 whitespace-nowrap rounded-md bg-slate-900 px-2 py-1 text-xs font-medium text-white shadow-lg"
+          className="pointer-events-none fixed z-[100] -translate-y-1/2 whitespace-nowrap rounded-ctrl bg-fg px-2.5 py-1 text-cap font-medium text-on-primary"
           style={{ top: workspaceTooltip.top, left: workspaceTooltip.left }}
         >
           {workspaceTooltip.name}

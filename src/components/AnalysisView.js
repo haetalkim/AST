@@ -4,7 +4,6 @@ import {
   ScatterChart, Scatter, CartesianGrid, ZAxis,
 } from 'recharts';
 import {
-  AlertTriangle,
   BarChart3,
   Calendar,
   Check,
@@ -1099,18 +1098,15 @@ const AnalysisView = ({
             ))}
           </div>
 
-      {/* Outlier / surprising-reading callouts — a quiet accent-bordered note rather than a
-          filled color block, consistent with the restrained callout style elsewhere. */}
+      {/* Outlier / surprising-reading callouts — a plain card like any other on this page,
+          not a colored alert block/stripe. */}
       {dailyOutliers.length > 0 && (
-        <div className="bg-surface border border-hairline-soft border-l-[3px] border-l-aqi-moderate rounded-card p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle className="w-4 h-4 text-aqi-moderate" />
-            <h3 className="text-small font-semibold text-fg">Surprising readings to investigate</h3>
-          </div>
-          <ul className="text-small text-secondary space-y-1">
+        <div className="bg-surface border border-hairline-soft rounded-card p-4">
+          <h3 className="text-small font-semibold text-fg">Surprising readings to investigate</h3>
+          <ul className="text-small text-secondary space-y-1 mt-2">
             {dailyOutliers.slice(0, 5).map((o, idx) => (
               <li key={idx}>
-                • <strong className="text-fg">{o.point.date}</strong>: {o.value} {metricThemes[selectedMetric].unit} — unusually{' '}
+                {o.point.date}: {o.value} {metricThemes[selectedMetric].unit} — unusually{' '}
                 {o.direction === 'high' ? 'high' : 'low'} compared to the rest of this series.
               </li>
             ))}
