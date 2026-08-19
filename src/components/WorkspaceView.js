@@ -749,7 +749,22 @@ const WorkspaceView = ({
   const [chartType, setChartType] = useState('auto');
   const [selectedIds, setSelectedIds] = useState([]);
   const canvasRef = useRef(null);
+  const canvasScrollRef = useRef(null);
   const itemRefs = useRef(new Map());
+  // The empty-state notice centers on the *visible* scroll viewport, not the
+  // full (much wider) canvas — otherwise it lands off to one side whenever
+  // the canvas is wider than what's on screen.
+  const [canvasViewport, setCanvasViewport] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const el = canvasScrollRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return undefined;
+    const measure = () => setCanvasViewport({ width: el.clientWidth, height: el.clientHeight });
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const validChartTypes = useMemo(() => {
     const xNumeric = isNumeric(xColumn);
@@ -899,7 +914,11 @@ const WorkspaceView = ({
         </div>
       </div>
 
-      <div className="canvas overflow-auto rounded-card border border-hairline bg-canvas shadow-inner" style={{ maxHeight: 'calc(100vh - 190px)' }}>
+      <div
+        ref={canvasScrollRef}
+        className="canvas overflow-auto rounded-card border border-hairline bg-canvas shadow-inner"
+        style={{ maxHeight: 'calc(100vh - 190px)' }}
+      >
         <div
           ref={canvasRef}
           className="relative bg-slate-50"
@@ -912,8 +931,13 @@ const WorkspaceView = ({
         >
           {workspaceItems.length === 0 && (
             <div
-              className="absolute left-1/2 top-[16%] w-[min(34rem,92%)] -translate-x-1/2 overflow-hidden rounded-[22px] border border-white/60 bg-white/75 px-7 py-6 text-left shadow-[0_18px_50px_rgba(15,23,42,0.14)] backdrop-blur-xl"
-              style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif' }}
+              className="absolute w-[min(34rem,92%)] overflow-hidden rounded-[22px] border border-white/60 bg-white/75 px-7 py-6 text-left shadow-[0_18px_50px_rgba(15,23,42,0.14)] backdrop-blur-xl"
+              style={{
+                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif',
+                left: canvasViewport.width ? canvasViewport.width / 2 : '50%',
+                top: canvasViewport.height ? Math.max(24, canvasViewport.height * 0.16) : '16%',
+                transform: 'translateX(-50%)',
+              }}
             >
               <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">Workspace</p>
               <h2 className="mt-1 text-[22px] font-semibold tracking-tight text-slate-900">

@@ -1099,22 +1099,23 @@ const AnalysisView = ({
             ))}
           </div>
 
-      {/* Outlier / surprising-reading callouts */}
+      {/* Outlier / surprising-reading callouts — a quiet accent-bordered note rather than a
+          filled color block, consistent with the restrained callout style elsewhere. */}
       {dailyOutliers.length > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-card p-4">
+        <div className="bg-surface border border-hairline-soft border-l-[3px] border-l-aqi-moderate rounded-card p-4">
           <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle className="w-4 h-4 text-amber-600" />
-            <h3 className="text-small font-bold text-amber-900">Surprising readings to investigate</h3>
+            <AlertTriangle className="w-4 h-4 text-aqi-moderate" />
+            <h3 className="text-small font-semibold text-fg">Surprising readings to investigate</h3>
           </div>
-          <ul className="text-small text-amber-800 space-y-1">
+          <ul className="text-small text-secondary space-y-1">
             {dailyOutliers.slice(0, 5).map((o, idx) => (
               <li key={idx}>
-                • <strong>{o.point.date}</strong>: {o.value} {metricThemes[selectedMetric].unit} — unusually{' '}
+                • <strong className="text-fg">{o.point.date}</strong>: {o.value} {metricThemes[selectedMetric].unit} — unusually{' '}
                 {o.direction === 'high' ? 'high' : 'low'} compared to the rest of this series.
               </li>
             ))}
           </ul>
-          <p className="text-cap text-amber-700 mt-2">
+          <p className="text-cap text-muted mt-2">
             Flagged using the 1.5×IQR rule — a starting point for discussion, not a definitive error.
           </p>
         </div>
@@ -1324,7 +1325,10 @@ const AnalysisView = ({
         )}
       </div>
 
-      {/* Distribution Analysis */}
+      {/* Distribution + box plot — paired side-by-side; each is a compact single-metric summary
+          that doesn't need the full page width on its own. */}
+      {(openSections.distribution || openSections.box) && (
+      <div className={`grid grid-cols-1 gap-6 ${openSections.distribution && openSections.box ? 'lg:grid-cols-2' : ''}`}>
       {openSections.distribution && (
       <div ref={distributionChartRef} className="bg-surface rounded-card p-6 border border-hairline-soft">
         <div className="flex items-start justify-between gap-3 mb-2">
@@ -1428,6 +1432,8 @@ const AnalysisView = ({
         <BoxPlot groups={boxPlotGroups} unit={metricThemes[selectedMetric].unit} color={theme.primary} />
       </div>
       )}
+      </div>
+      )}
 
       {/* Bivariate / scatter — relationship between two variables */}
       {openSections.scatter && (
@@ -1515,15 +1521,9 @@ const AnalysisView = ({
 
       {/* Summary Insights */}
       {openSections.insights && (
-      <div 
-        className="rounded-card p-8 border"
-        style={{ 
-          background: `linear-gradient(135deg, ${theme.light} 0%, white 100%)`,
-          borderColor: theme.primary
-        }}
-      >
+      <div className="rounded-card p-8 border border-hairline-soft bg-surface">
         <h2 className="mb-4 flex items-center gap-2 text-tile text-fg">
-          <Lightbulb className="h-5 w-5" aria-hidden="true" />
+          <Lightbulb className="h-5 w-5" style={{ color: theme.primary }} aria-hidden="true" />
           Key Insights
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
