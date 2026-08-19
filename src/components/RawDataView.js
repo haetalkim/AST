@@ -316,6 +316,13 @@ const RawDataView = ({
     return m ? normHierarchy(m.group) : '';
   };
   const selectedClassLabel = classPeriods.find((c) => c.key === scopeClassKey)?.label || '';
+  // File-finder-style path for the current scope (School › Class › Group), only as deep as
+  // the selected scope tab — mirrors the School/Class/Group toggle above it.
+  const scopeBreadcrumb = [
+    viewerIdentity.school,
+    scopeTab !== 'school' ? selectedClassLabel : null,
+    scopeTab === 'group' ? scopeGroup : null,
+  ].filter(Boolean);
 
   // Keep Class/Group selects honest: if state is blank or stale, snap to a real option so the
   // visible dropdown value matches what the table filter uses.
@@ -933,7 +940,7 @@ const RawDataView = ({
       </div>
 
       {/* Merged toolbar: scope tabs · search · filter chips · Apply / Clear */}
-      <div className="bg-surface border border-hairline-soft rounded-card p-4">
+      <div className="bg-surface border border-hairline-soft rounded-card p-4 space-y-3">
         <div className="flex flex-wrap items-center gap-3">
           {/* Scope tabs — a within-class convenience filter; hidden in the aggregate workspaces. */}
           {!isReadOnly && (
@@ -1092,8 +1099,24 @@ const RawDataView = ({
             )}
           </div>
 
-          {/* Apply / Clear — grouped as one unit so they wrap together instead of splitting
-              across lines, and pushed to the end of the toolbar as the row's actions. */}
+        </div>
+
+        {/* Second row: a file-path-style breadcrumb for the current scope on the left,
+            Apply/Clear as one grouped unit on the right. */}
+        <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-hairline-soft">
+          <nav aria-label="Current scope" className="flex items-center gap-1.5 text-small text-secondary min-w-0">
+            {scopeBreadcrumb.map((crumb, idx) => (
+              <span key={idx} className="flex items-center gap-1.5 min-w-0">
+                {idx > 0 && <ChevronRight className="w-3.5 h-3.5 text-muted shrink-0" aria-hidden="true" />}
+                <span className={`truncate ${idx === scopeBreadcrumb.length - 1 ? 'font-semibold text-fg' : ''}`}>
+                  {crumb}
+                </span>
+              </span>
+            ))}
+            {scopeTab === 'school' && (
+              <span className="text-muted">— all sessions across the school.</span>
+            )}
+          </nav>
           <div className="flex items-center gap-2 ml-auto shrink-0">
             <button
               onClick={clearFilters}
@@ -1108,10 +1131,6 @@ const RawDataView = ({
               Apply
             </button>
           </div>
-
-          {scopeTab === 'school' && (
-            <span className="text-small text-muted w-full md:w-auto">All sessions across {viewerIdentity.school}.</span>
-          )}
         </div>
       </div>
 

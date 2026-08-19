@@ -996,79 +996,72 @@ const AnalysisView = ({
                 Avg: {getStatusLabel(avgValue, selectedMetric)}
               </span>
             )}
-          </div>
-          {/* Second row: how you're viewing the data (sections) and, for teachers, which
-              period/group to focus on — grouped together since both narrow what's shown,
-              separated from the "what metric" row above. */}
-          {(isTeacher || (activeTab === 'overview' && hasData)) && (
-            <div className="frow flex flex-wrap items-center gap-3">
-              {activeTab === 'overview' && hasData && (
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="flabel text-small text-muted shrink-0">View</span>
-                  <div className="segwide flex flex-wrap gap-1 rounded-pill border border-hairline bg-canvas p-1">
-                    {[
-                      ['recent', 'Recent'],
-                      ['trends', 'Trends'],
-                      ['distribution', 'Distribution'],
-                      ['box', 'Box plot'],
-                      ['scatter', 'Scatter'],
-                      ['insights', 'Insights'],
-                    ].map(([key, label]) => (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() => toggleSection(key)}
-                        aria-expanded={openSections[key]}
-                        className={`flex items-center gap-1 rounded-pill px-2.5 h-7 text-cap font-semibold transition-colors ${
-                          openSections[key] ? 'bg-fg text-white' : 'text-secondary hover:bg-surface'
-                        }`}
-                      >
-                        {label}
-                        <ChevronDown className={`h-3 w-3 transition-transform ${openSections[key] ? 'rotate-180' : ''}`} />
-                      </button>
+            {/* Period/Group focus — same row as the metric chips, just set off with a
+                hairline divider instead of pushed to its own row. */}
+            {isTeacher && (
+              <div className="ml-auto flex flex-wrap items-center gap-3 pl-3 border-l border-hairline-soft">
+                <label className="relative z-20 flex items-center gap-1.5 text-small text-secondary">
+                  <span className="flabel shrink-0">Period</span>
+                  <select
+                    value={focusPeriod}
+                    onChange={(e) => {
+                      setFocusPeriod(e.target.value);
+                      setFocusGroup('all');
+                    }}
+                    className="sel-sm min-w-[7.5rem] h-9 rounded-ctrl border border-hairline bg-surface px-2.5 text-small text-fg"
+                    aria-label="Focus period for analysis"
+                  >
+                    <option value="all">All periods</option>
+                    {focusPeriodOptions.map((period) => (
+                      <option key={period} value={period}>{period}</option>
                     ))}
-                  </div>
-                </div>
-              )}
-              {isTeacher && (
-                <div
-                  className={`ml-auto flex flex-wrap items-center gap-3 ${
-                    activeTab === 'overview' && hasData ? 'pl-3 border-l border-hairline-soft' : ''
-                  }`}
-                >
-                  <label className="relative z-20 flex items-center gap-1.5 text-small text-secondary">
-                    <span className="flabel shrink-0">Period</span>
-                    <select
-                      value={focusPeriod}
-                      onChange={(e) => {
-                        setFocusPeriod(e.target.value);
-                        setFocusGroup('all');
-                      }}
-                      className="sel-sm min-w-[7.5rem] h-9 rounded-ctrl border border-hairline bg-surface px-2.5 text-small text-fg"
-                      aria-label="Focus period for analysis"
-                    >
-                      <option value="all">All periods</option>
-                      {focusPeriodOptions.map((period) => (
-                        <option key={period} value={period}>{period}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="relative z-20 flex items-center gap-1.5 text-small text-secondary">
-                    <span className="flabel shrink-0">Group</span>
-                    <select
-                      value={focusGroup}
-                      onChange={(e) => setFocusGroup(e.target.value)}
-                      className="sel-sm min-w-[7.5rem] h-9 rounded-ctrl border border-hairline bg-surface px-2.5 text-small text-fg"
-                      aria-label="Focus group for analysis"
-                    >
-                      <option value="all">All groups</option>
-                      {focusGroupOptions.map((group) => (
-                        <option key={group} value={group}>{group}</option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-              )}
+                  </select>
+                </label>
+                <label className="relative z-20 flex items-center gap-1.5 text-small text-secondary">
+                  <span className="flabel shrink-0">Group</span>
+                  <select
+                    value={focusGroup}
+                    onChange={(e) => setFocusGroup(e.target.value)}
+                    className="sel-sm min-w-[7.5rem] h-9 rounded-ctrl border border-hairline bg-surface px-2.5 text-small text-fg"
+                    aria-label="Focus group for analysis"
+                  >
+                    <option value="all">All groups</option>
+                    {focusGroupOptions.map((group) => (
+                      <option key={group} value={group}>{group}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            )}
+          </div>
+          {/* Second row: how you're viewing the data (sections) — kept separate since it's a
+              different kind of control (which charts render) than the filters above. */}
+          {activeTab === 'overview' && hasData && (
+            <div className="frow flex flex-wrap items-center gap-1.5">
+              <span className="flabel text-small text-muted shrink-0">View</span>
+              <div className="segwide flex flex-wrap gap-1 rounded-pill border border-hairline bg-canvas p-1">
+                {[
+                  ['recent', 'Recent'],
+                  ['trends', 'Trends'],
+                  ['distribution', 'Distribution'],
+                  ['box', 'Box plot'],
+                  ['scatter', 'Scatter'],
+                  ['insights', 'Insights'],
+                ].map(([key, label]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => toggleSection(key)}
+                    aria-expanded={openSections[key]}
+                    className={`flex items-center gap-1 rounded-pill px-2.5 h-7 text-cap font-semibold transition-colors ${
+                      openSections[key] ? 'bg-fg text-white' : 'text-secondary hover:bg-surface'
+                    }`}
+                  >
+                    {label}
+                    <ChevronDown className={`h-3 w-3 transition-transform ${openSections[key] ? 'rotate-180' : ''}`} />
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -1798,57 +1791,44 @@ const AnalysisView = ({
             <ReflectionPrompt storageKey={`quick-compare-${compareMode}-${selectedMetric}`} mode="cer" />
           </div>
 
-          {/* Insights */}
+          {/* Insights — plain neutral cards, no gradients or colored bullets. */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-gradient-to-br from-green-50 to-white rounded-card p-6 border border-green-200">
+            <div className="bg-surface rounded-card p-6 border border-hairline-soft">
               <h3 className="text-tile text-fg mb-3">Quick read</h3>
               <ul className="space-y-2 text-small text-secondary">
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600 mt-0.5">•</span>
-                  <span>
-                    <strong>Your group</strong> average for this metric: {avgValue} {metricThemes[selectedMetric].unit}.
-                  </span>
+                <li>
+                  <strong className="text-fg">Your group</strong> average for this metric: {avgValue} {metricThemes[selectedMetric].unit}.
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600 mt-0.5">•</span>
-                  <span>
-                    {classAverage != null
-                      ? `Class-wide (same period) average is ${classAverage} ${metricThemes[selectedMetric].unit}.`
-                      : 'Class average needs more imported rows (other groups in the same period).'}
-                  </span>
+                <li>
+                  {classAverage != null
+                    ? `Class-wide (same period) average is ${classAverage} ${metricThemes[selectedMetric].unit}.`
+                    : 'Class average needs more imported rows (other groups in the same period).'}
                 </li>
               </ul>
             </div>
 
-            <div className="bg-gradient-to-br from-blue-50 to-white rounded-card p-6 border border-blue-200">
+            <div className="bg-surface rounded-card p-6 border border-hairline-soft">
               <h3 className="text-tile text-fg mb-3">Compare further</h3>
               <ul className="space-y-2 text-small text-secondary">
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 mt-0.5">•</span>
-                  <span>
-                    On <strong>Overview</strong>, compare the recent week with Philadelphia, New York, or Hanoi.
-                  </span>
+                <li>
+                  On <strong className="text-fg">Overview</strong>, compare the recent week with Philadelphia, New York, or Hanoi.
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 mt-0.5">•</span>
-                  <span>Use the compare mode selector above to switch between OpenAQ, other groups, class, and school.</span>
-                </li>
+                <li>Use the compare mode selector above to switch between OpenAQ, other groups, class, and school.</li>
               </ul>
             </div>
           </div>
 
-          {/* CTA for Full Comparison */}
-          <div className={`bg-gradient-to-r ${theme.bg} ${theme.hover} rounded-card p-6 text-white`}>
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-tile mb-2">Want to explore more comparisons?</h3>
-                <p className="text-small opacity-90">Compare with other schools, locations, and time periods</p>
-              </div>
-              <Button variant="neutral" onClick={() => setShowCompareModal(true)}>
-                <GitCompareArrows className="h-4 w-4" aria-hidden="true" />
-                Open detailed comparison
-              </Button>
+          {/* CTA for Full Comparison — a plain card with a normal primary button, not a
+              full-bleed colored banner. */}
+          <div className="bg-surface rounded-card p-6 border border-hairline-soft flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h3 className="text-tile text-fg mb-1">Want to explore more comparisons?</h3>
+              <p className="text-small text-muted">Compare with other schools, locations, and time periods</p>
             </div>
+            <Button onClick={() => setShowCompareModal(true)}>
+              <GitCompareArrows className="h-4 w-4" aria-hidden="true" />
+              Open detailed comparison
+            </Button>
           </div>
         </div>
       )}
