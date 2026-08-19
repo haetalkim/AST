@@ -9,7 +9,7 @@ import WorkspaceView, { followAttachedNotes } from "./components/WorkspaceView";
 import MyPage from "./components/MyPage";
 import ManageClasses from "./components/ManageClasses";
 import Avatar from "./components/ui/Avatar";
-import { MapPin, Table, BarChart3, User, LogOut, Users, LayoutGrid, Globe2, GraduationCap } from "lucide-react";
+import { MapPin, Table, BarChart3, LogOut, Users, LayoutGrid, Globe2, GraduationCap } from "lucide-react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
 import {
@@ -732,14 +732,12 @@ export default function App() {
         { id: 'rawdata', label: 'Raw Data', icon: Table },
         { id: 'analysis', label: 'Analysis', icon: BarChart3 },
         { id: 'workspace', label: 'Workspace', icon: LayoutGrid },
-        { id: 'mypage', label: 'My Page', icon: User },
       ]
     : [
         { id: 'heatmap', label: 'Heat Map', icon: MapPin },
         { id: 'rawdata', label: 'Raw Data', icon: Table },
         { id: 'analysis', label: 'Analysis', icon: BarChart3 },
         { id: 'workspace', label: 'Workspace', icon: LayoutGrid },
-        { id: 'mypage', label: 'My Page', icon: User },
       ];
 
   if (!isLoggedIn) {
@@ -942,7 +940,14 @@ export default function App() {
             {/* Account cluster: identity + logout stay together on the right */}
             <div className="flex shrink-0 items-center gap-3 xl:gap-4">
               {!isPublicMode && (
-                <>
+                <button
+                  type="button"
+                  onClick={() => setActiveSection("mypage")}
+                  className={`flex shrink-0 items-center gap-3 rounded-lg px-2 py-1 -mx-2 transition-colors ${
+                    activeSection === "mypage" ? "bg-blue-50" : "hover:bg-gray-100"
+                  }`}
+                  title="My page"
+                >
                   <div className="hidden min-w-[12rem] max-w-[16rem] text-right lg:block xl:max-w-[20rem] 2xl:max-w-[24rem]">
                     <p className="truncate text-sm font-medium text-gray-900">
                       {isTeacher
@@ -962,7 +967,7 @@ export default function App() {
                     </p>
                   </div>
                   <Avatar size="sm" className="border-2 border-white shadow-md" />
-                </>
+                </button>
               )}
               <button
                 onClick={handleLogout}
