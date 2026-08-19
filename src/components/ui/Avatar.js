@@ -1,11 +1,12 @@
 import React from 'react';
-import defaultAvatar from '../../assets/default-avatar.png';
+import defaultAvatar from '../../assets/default-avatar.svg';
 
 /**
  * Default profile picture. No photo upload exists yet, so every avatar in
- * the app today is a placeholder — use the exact default-avatar asset
- * (rather than approximating it with an icon+background) for pixel-accurate
- * results.
+ * the app today is a placeholder. This is a clean vector redraw of the
+ * reference icon (the original was a watermarked stock preview with
+ * uneven padding, which showed through as a dark sliver and white gaps
+ * once cropped into a circle) — it fills the circle edge-to-edge at any size.
  */
 const SIZE_CLASSES = {
   sm: 'w-10 h-10',
