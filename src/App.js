@@ -9,6 +9,7 @@ import WorkspaceView, { followAttachedNotes } from "./components/WorkspaceView";
 import MyPage from "./components/MyPage";
 import ManageClasses from "./components/ManageClasses";
 import Avatar from "./components/ui/Avatar";
+import GuidedTour from "./components/ui/GuidedTour";
 import { MapPin, Table, BarChart3, LogOut, Users, LayoutGrid, Globe2, GraduationCap } from "lucide-react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
@@ -87,6 +88,68 @@ const METRIC_THEMES = {
 };
 
 
+/**
+ * The "Analysis → Workspace" guided tour. It spans two sections on purpose — the whole
+ * point is to walk someone from making a chart to actually building a report with it, so
+ * the tour follows them there instead of stopping at "click this button."
+ */
+const ANALYSIS_WORKSPACE_TOUR_STEPS = [
+  {
+    section: 'analysis',
+    selector: '[data-tour="metric-chips"]',
+    title: 'Start with a metric',
+    body: 'Pick PM 2.5, CO, temperature, or humidity — every chart below focuses on whichever one is selected.',
+  },
+  {
+    section: 'analysis',
+    selector: '[data-tour="period-group"]',
+    title: 'Narrow the focus',
+    body: 'As a teacher, you can zoom into one period or group instead of the whole class.',
+  },
+  {
+    section: 'analysis',
+    selector: '[data-tour="view-toggle"]',
+    title: 'Choose how to see it',
+    body: 'Turn chart sections on or off — recent readings, trends, distribution, box plot, scatter, and insights.',
+  },
+  {
+    section: 'analysis',
+    selector: '[data-tour="compare-tab"]',
+    title: 'Compare against others',
+    body: 'Switch here to line your data up against other groups, your class, your school, or nearby city sensors.',
+  },
+  {
+    section: 'analysis',
+    selector: '[data-tour="send-to-workspace"]',
+    title: 'Send a chart to your Workspace',
+    body: "Any chart with this button can be pinned to your Workspace — that's where you'll build the actual report. Let's go there now.",
+  },
+  {
+    section: 'workspace',
+    selector: '[data-tour="workspace-build"]',
+    title: "You're in the Workspace",
+    body: 'Charts you send here land on this board as cards. You can also build a new one from scratch with this button — no need to go back to Analysis.',
+  },
+  {
+    section: 'workspace',
+    selector: '[data-tour="workspace-note"]',
+    title: 'Stick a note next to it',
+    body: 'Add a note, then drag it right next to a chart — it snaps into place and stays linked, so your observation travels with the evidence.',
+  },
+  {
+    section: 'workspace',
+    selector: '[data-tour="workspace-canvas"]',
+    title: 'Move things around freely',
+    body: 'This whole board is yours to arrange — drag any chart or note anywhere to lay out your story the way you want it.',
+  },
+  {
+    section: 'workspace',
+    selector: '[data-tour="workspace-export"]',
+    title: 'Export when ready',
+    body: 'Export just the cards you select, or the whole board as one image — ready to drop into slides or a lab write-up.',
+  },
+];
+
 /** Client-side "current workspace" selection; the server has no notion of one. */
 const WORKSPACE_STORAGE_KEY = "airstory.currentWorkspaceId";
 /** Carries an invite token through the Firebase handshake (popup, refresh, log-in-then-accept). */
@@ -101,6 +164,7 @@ function readInviteTokenFromLocation() {
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeSection, setActiveSection] = useState("heatmap");
+  const [showAnalysisTour, setShowAnalysisTour] = useState(false);
   // Bumped to signal MyPage to scroll/focus the school field (e.g. from Manage Classes "Edit").
   const [schoolFocusNonce, setSchoolFocusNonce] = useState(0);
   const [selectedMetric, setSelectedMetric] = useState("pm25");
@@ -1046,6 +1110,7 @@ export default function App() {
             classStructure={classStructure}
             onSendToWorkspace={handleAddWorkspaceItem}
             userRole={userRole}
+            onStartTour={() => setShowAnalysisTour(true)}
           />
         )}
         {activeSection === 'workspace' && (
@@ -1095,6 +1160,16 @@ export default function App() {
           />
         )}
       </main>
+
+      {/* Spans Analysis + Workspace, so it has to live above both — otherwise it would
+          unmount the moment the tour switches sections. */}
+      <GuidedTour
+        steps={ANALYSIS_WORKSPACE_TOUR_STEPS}
+        open={showAnalysisTour}
+        onClose={() => setShowAnalysisTour(false)}
+        currentSection={activeSection}
+        onNavigate={setActiveSection}
+      />
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-20">

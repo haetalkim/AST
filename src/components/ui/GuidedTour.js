@@ -19,9 +19,13 @@ function measure(selector) {
  * target isn't currently in the DOM (e.g. a teacher-only control for a student view) are
  * skipped automatically rather than breaking the tour.
  *
- * steps: [{ selector: '[data-tour="x"]', title, body }]
+ * Steps can belong to different app sections (e.g. Analysis, then Workspace) — pass the
+ * app's current section plus a setter, and the tour will switch sections itself as it
+ * advances or goes back, waiting for that section's elements to mount before continuing.
+ *
+ * steps: [{ selector: '[data-tour="x"]', title, body, section? }]
  */
-export default function GuidedTour({ steps, open, onClose }) {
+export default function GuidedTour({ steps, open, onClose, currentSection, onNavigate }) {
   const [index, setIndex] = useState(0);
   const [rect, setRect] = useState(null);
   const [ready, setReady] = useState(false);
@@ -33,35 +37,38 @@ export default function GuidedTour({ steps, open, onClose }) {
     }
   }, [open]);
 
-  // Recompute the target's position; skip forward past any step whose element isn't
-  // currently rendered, and close the tour if none of the remaining steps resolve.
+  // Recompute the target's position each step. If the step lives in a different app
+  // section, navigate there first and wait for that section to mount. If the target
+  // still isn't in the DOM once we're in the right section (e.g. a teacher-only control),
+  // skip ahead rather than breaking the tour.
   useLayoutEffect(() => {
     if (!open) return;
-    let i = index;
-    let found = null;
-    while (i < steps.length) {
-      found = measure(steps[i].selector);
-      if (found) break;
-      i += 1;
-    }
-    if (i !== index) {
-      setIndex(i);
+    const step = steps[index];
+    if (!step) {
+      onClose?.();
       return;
     }
+    if (step.section && currentSection && step.section !== currentSection) {
+      setReady(false);
+      onNavigate?.(step.section);
+      return;
+    }
+    const found = measure(step.selector);
     if (!found) {
-      onClose?.();
+      if (index < steps.length - 1) setIndex(index + 1);
+      else onClose?.();
       return;
     }
     setRect(found);
     setReady(true);
-    const target = document.querySelector(steps[i].selector);
+    const target = document.querySelector(step.selector);
     const reduceMotion =
       typeof window !== 'undefined' &&
       window.matchMedia &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     target?.scrollIntoView({ block: 'center', behavior: reduceMotion ? 'auto' : 'smooth' });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, index, steps.length]);
+  }, [open, index, currentSection, steps.length]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -89,6 +96,8 @@ export default function GuidedTour({ steps, open, onClose }) {
 
   const step = steps[index];
   const isLast = index === steps.length - 1;
+  const sectionChanged = step.section && currentSection && step.section !== currentSection;
+  const sectionLabel = step.section ? step.section.charAt(0).toUpperCase() + step.section.slice(1) : '';
 
   const hole = {
     top: rect.top - HOLE_PAD,
@@ -135,7 +144,7 @@ export default function GuidedTour({ steps, open, onClose }) {
       >
         <div className="flex items-start justify-between gap-2">
           <p className="text-cap font-semibold uppercase tracking-wide text-muted">
-            Step {index + 1} of {steps.length}
+            {sectionLabel ? `${sectionLabel} · ` : ''}Step {index + 1} of {steps.length}
           </p>
           <button
             type="button"
@@ -146,8 +155,10 @@ export default function GuidedTour({ steps, open, onClose }) {
             <X className="w-4 h-4" />
           </button>
         </div>
-        <p className="text-small font-semibold text-fg mt-1.5">{step.title}</p>
-        <p className="text-small text-secondary mt-1">{step.body}</p>
+        <p className="text-small font-semibold text-fg mt-1.5">
+          {sectionChanged ? `Heading to ${sectionLabel}…` : step.title}
+        </p>
+        {!sectionChanged && <p className="text-small text-secondary mt-1">{step.body}</p>}
         <div className="flex items-center justify-between mt-4">
           <div className="flex items-center gap-1">
             {steps.map((s, i) => (

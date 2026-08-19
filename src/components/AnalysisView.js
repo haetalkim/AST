@@ -40,35 +40,6 @@ import BoxPlot from './charts/BoxPlot';
 import ChartFrame from './charts/ChartFrame';
 import ReflectionPrompt from './charts/ReflectionPrompt';
 import Button from './ui/Button';
-import GuidedTour from './ui/GuidedTour';
-
-const TOUR_STEPS = [
-  {
-    selector: '[data-tour="metric-chips"]',
-    title: 'Start with a metric',
-    body: 'Pick PM 2.5, CO, temperature, or humidity — every chart below focuses on whichever one is selected.',
-  },
-  {
-    selector: '[data-tour="period-group"]',
-    title: 'Narrow the focus',
-    body: "As a teacher, you can zoom into one period or group instead of the whole class.",
-  },
-  {
-    selector: '[data-tour="view-toggle"]',
-    title: 'Choose how to see it',
-    body: 'Turn chart sections on or off — recent readings, trends, distribution, box plot, scatter, and insights.',
-  },
-  {
-    selector: '[data-tour="compare-tab"]',
-    title: 'Compare against others',
-    body: 'Switch here to line your data up against other groups, your class, your school, or nearby city sensors.',
-  },
-  {
-    selector: '[data-tour="send-to-workspace"]',
-    title: 'Save what matters',
-    body: 'Any chart with this button can be pinned straight to your Workspace tab, ready to present later.',
-  },
-];
 
 /** Shared "good defaults" axis styling: visible axis line + tick line, per the chart-defaults checklist item. */
 const AXIS_STYLE = { fontSize: '12px' };
@@ -555,6 +526,7 @@ const AnalysisView = ({
   classStructure,
   onSendToWorkspace,
   userRole = 'student',
+  onStartTour,
 }) => {
   const isTeacher = userRole === 'teacher';
   const [showCompareModal, setShowCompareModal] = useState(false);
@@ -568,7 +540,6 @@ const AnalysisView = ({
   // Teachers see every period/group in the class — focus controls narrow Analysis immersion.
   const [focusPeriod, setFocusPeriod] = useState(filters.period || 'all');
   const [focusGroup, setFocusGroup] = useState(filters.group || 'all');
-  const [showTour, setShowTour] = useState(false);
   const [openSections, setOpenSections] = useState({
     recent: true,
     trends: true,
@@ -982,7 +953,7 @@ const AnalysisView = ({
             type="button"
             onClick={() => {
               setActiveTab('overview');
-              setShowTour(true);
+              onStartTour?.();
             }}
             className="inline-flex items-center gap-1.5 h-7 px-2.5 text-cap font-semibold text-secondary rounded-pill border border-hairline bg-surface hover:bg-canvas transition-colors"
           >
@@ -1879,8 +1850,6 @@ const AnalysisView = ({
           </div>
         </div>
       )}
-
-      <GuidedTour steps={TOUR_STEPS} open={showTour} onClose={() => setShowTour(false)} />
 
       {/* Modals */}
       <ComparisonModal

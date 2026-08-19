@@ -896,16 +896,16 @@ const WorkspaceView = ({
           </p>
         </div>
         <div className="actions flex flex-wrap items-center gap-2">
-          <Button size="sm" onClick={() => setBuilderOpen(true)}>
+          <Button data-tour="workspace-build" size="sm" onClick={() => setBuilderOpen(true)}>
             <Plus className="h-4 w-4" /> Build chart
           </Button>
-          <Button size="sm" variant="neutral" onClick={addNote}>
+          <Button data-tour="workspace-note" size="sm" variant="neutral" onClick={addNote}>
             <FileText className="h-4 w-4" /> Add note
           </Button>
           <Button size="sm" variant="neutral" disabled={!selectedIds.length} onClick={exportSelected}>
             <CheckSquare className="h-4 w-4" /> Export selected ({selectedIds.length})
           </Button>
-          <Button size="sm" variant="neutral" disabled={!workspaceItems.length} onClick={exportWorkspace}>
+          <Button data-tour="workspace-export" size="sm" variant="neutral" disabled={!workspaceItems.length} onClick={exportWorkspace}>
             <Download className="h-4 w-4" /> Export workspace
           </Button>
           <Button size="sm" variant="danger" disabled={!selectedIds.length} onClick={deleteSelected}>
@@ -916,6 +916,7 @@ const WorkspaceView = ({
 
       <div
         ref={canvasScrollRef}
+        data-tour="workspace-canvas"
         className="canvas overflow-auto rounded-card border border-hairline bg-canvas shadow-inner"
         style={{ maxHeight: 'calc(100vh - 190px)' }}
       >
