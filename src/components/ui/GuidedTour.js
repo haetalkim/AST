@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 const HOLE_PAD = 8;
 const CARD_WIDTH = 300;
 const VIEWPORT_MARGIN = 16;
+const DIM_COLOR = 'rgba(17, 17, 20, 0.28)';
 
 function measure(selector) {
   const el = typeof selector === 'string' ? document.querySelector(selector) : selector;
@@ -97,6 +98,24 @@ export default function GuidedTour({ steps, open, onClose, currentSection, onNav
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, index, steps.length]);
 
+  // Make the tour genuinely interactive: once a step's target is spotlighted, clicking it
+  // for real (not just clicking "Next") both performs the actual action and advances the
+  // tour. Listening in the bubble phase means the element's own click handling always runs
+  // first, so we never interfere with it.
+  useEffect(() => {
+    if (!open || !ready) return undefined;
+    const step = steps[index];
+    if (!step) return undefined;
+    const target = document.querySelector(step.selector);
+    if (!target) return undefined;
+    const advance = () => {
+      if (index < steps.length - 1) setIndex(index + 1);
+      else onClose?.();
+    };
+    target.addEventListener('click', advance);
+    return () => target.removeEventListener('click', advance);
+  }, [open, ready, index, steps, onClose]);
+
   if (!open || !rect) return null;
 
   const step = steps[index];
@@ -121,13 +140,29 @@ export default function GuidedTour({ steps, open, onClose, currentSection, onNav
     window.innerWidth - CARD_WIDTH - VIEWPORT_MARGIN
   );
 
+  // Dim everything except the spotlighted hole using four separate strips rather than one
+  // full-viewport overlay — that way the hole has literally nothing covering it, so the
+  // highlighted control underneath stays genuinely clickable instead of just decorative.
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const dimStrips = [
+    { top: 0, left: 0, width: vw, height: Math.max(0, hole.top) }, // above
+    { top: hole.top + hole.height, left: 0, width: vw, height: Math.max(0, vh - (hole.top + hole.height)) }, // below
+    { top: hole.top, left: 0, width: Math.max(0, hole.left), height: hole.height }, // left
+    { top: hole.top, left: hole.left + hole.width, width: Math.max(0, vw - (hole.left + hole.width)), height: hole.height }, // right
+  ];
+
   return (
     <div aria-live="polite">
-      <div
-        className="fixed inset-0 z-[70]"
-        onClick={onClose}
-        role="presentation"
-      />
+      {dimStrips.map((s, i) => (
+        <div
+          key={i}
+          className="fixed z-[70] transition-all duration-300 ease-out"
+          onClick={onClose}
+          role="presentation"
+          style={{ ...s, background: DIM_COLOR, opacity: ready ? 1 : 0 }}
+        />
+      ))}
       <div
         className="fixed z-[71] rounded-xl pointer-events-none transition-all duration-300 ease-out"
         style={{
@@ -135,7 +170,7 @@ export default function GuidedTour({ steps, open, onClose, currentSection, onNav
           left: hole.left,
           width: hole.width,
           height: hole.height,
-          boxShadow: '0 0 0 9999px rgba(17, 17, 20, 0.55), 0 0 0 2px rgba(255,255,255,0.95), 0 0 22px rgba(0,113,227,0.35)',
+          boxShadow: '0 0 0 2px rgba(255,255,255,0.95), 0 0 22px rgba(0,113,227,0.35)',
           opacity: ready ? 1 : 0,
         }}
       />
@@ -164,6 +199,9 @@ export default function GuidedTour({ steps, open, onClose, currentSection, onNav
           {sectionChanged ? `Heading to ${sectionLabel}…` : step.title}
         </p>
         {!sectionChanged && <p className="text-small text-secondary mt-1">{step.body}</p>}
+        {!sectionChanged && (
+          <p className="text-cap text-muted mt-2">Go ahead and click the highlighted control to try it.</p>
+        )}
         <div className="flex items-center justify-between mt-4">
           <div className="flex items-center gap-1">
             {steps.map((s, i) => (
