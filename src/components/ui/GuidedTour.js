@@ -157,14 +157,14 @@ export default function GuidedTour({ steps, open, onClose, currentSection, onNav
       {dimStrips.map((s, i) => (
         <div
           key={i}
-          className="fixed z-[70] transition-all duration-300 ease-out"
+          className="fixed z-[70] transition-opacity duration-300 ease-out"
           onClick={onClose}
           role="presentation"
           style={{ ...s, background: DIM_COLOR, opacity: ready ? 1 : 0 }}
         />
       ))}
       <div
-        className="fixed z-[71] rounded-xl pointer-events-none transition-all duration-300 ease-out"
+        className="fixed z-[71] rounded-xl pointer-events-none transition-opacity duration-300 ease-out"
         style={{
           top: hole.top,
           left: hole.left,
@@ -175,7 +175,7 @@ export default function GuidedTour({ steps, open, onClose, currentSection, onNav
         }}
       />
       <div
-        className="fixed z-[72] rounded-card bg-surface border border-hairline-soft shadow-xl p-4 transition-all duration-300 ease-out"
+        className="fixed z-[72] rounded-card bg-surface border border-hairline-soft shadow-xl p-4 transition-opacity duration-300 ease-out"
         style={{ top: cardTop, left: cardLeft, width: CARD_WIDTH, opacity: ready ? 1 : 0 }}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
