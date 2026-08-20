@@ -200,7 +200,9 @@ export default function GuidedTour({ steps, open, onClose, currentSection, onNav
         </p>
         {!sectionChanged && <p className="text-small text-secondary mt-1">{step.body}</p>}
         {!sectionChanged && (
-          <p className="text-cap text-muted mt-2">Go ahead and click the highlighted control to try it.</p>
+          <p className="text-cap text-muted mt-2">
+            {isLast ? 'Click it to finish up.' : 'Click the highlighted control to continue.'}
+          </p>
         )}
         <div className="flex items-center justify-between mt-4">
           <div className="flex items-center gap-1">
@@ -211,24 +213,13 @@ export default function GuidedTour({ steps, open, onClose, currentSection, onNav
               />
             ))}
           </div>
-          <div className="flex items-center gap-2">
-            {index > 0 && (
-              <button
-                type="button"
-                onClick={() => setIndex((i) => Math.max(i - 1, 0))}
-                className="h-8 px-3 text-small text-secondary rounded-pill border border-hairline bg-surface hover:bg-canvas transition-colors"
-              >
-                Back
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={() => (isLast ? onClose?.() : setIndex((i) => i + 1))}
-              className="h-8 px-3 text-small text-white bg-fg rounded-pill hover:opacity-90 transition-opacity"
-            >
-              {isLast ? 'Done' : 'Next'}
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-cap text-muted hover:text-fg underline underline-offset-2 transition-colors"
+          >
+            Skip tour
+          </button>
         </div>
       </div>
     </div>
