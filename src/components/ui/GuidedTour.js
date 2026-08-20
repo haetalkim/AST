@@ -30,9 +30,14 @@ export default function GuidedTour({ steps, open, onClose, currentSection, onNav
   const [rect, setRect] = useState(null);
   const [ready, setReady] = useState(false);
 
-  useEffect(() => {
+  // Reset to the first step whenever the tour (re)opens. This is a layout effect, and it's
+  // declared before the measuring effect below, so it always runs first within the same
+  // commit — otherwise a tour closed mid-way through would briefly flash its old step/
+  // position before snapping back to the start.
+  useLayoutEffect(() => {
     if (open) {
       setIndex(0);
+      setRect(null);
       setReady(false);
     }
   }, [open]);
