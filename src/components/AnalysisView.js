@@ -210,23 +210,24 @@ const ComparisonModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={onClose}>
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div className="bg-surface rounded-card max-w-6xl w-full shadow-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <div className={`${theme.bg} text-white p-6 rounded-t-[18px] flex items-center justify-between sticky top-0 z-10`}>
+        <div className="p-6 border-b border-hairline-soft flex items-center justify-between sticky top-0 z-10 bg-surface rounded-t-card">
           <div>
-            <h3 className="text-tile">Compare data — {metricThemes[selectedMetric].label}</h3>
-            <p className="text-small opacity-90 mt-1">Compare across groups, schools, locations, and time periods</p>
+            <h3 className="text-tile text-fg">Compare data — {metricThemes[selectedMetric].label}</h3>
+            <p className="text-small text-secondary mt-1">Compare across groups, schools, locations, and time periods</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-ctrl transition-colors">
-            <X className="w-6 h-6" />
+          <button onClick={onClose} aria-label="Close" className="p-2 text-muted hover:text-fg hover:bg-canvas rounded-ctrl transition-colors">
+            <X className="w-5 h-5" />
           </button>
         </div>
         
         <div className="p-6">
-          {/* Comparison Type Selector */}
+          {/* Comparison Type Selector — a plain segmented row, same chip language as the
+              metric selector above, instead of a grid of centered-icon color tiles. */}
           <div className="mb-6">
-            <label className="block text-small font-semibold text-secondary mb-3">Comparison Type</label>
-            <div className="grid grid-cols-4 gap-3">
+            <p className="text-cap font-semibold uppercase tracking-wide text-muted mb-2">Comparison type</p>
+            <div className="flex flex-wrap gap-2">
               {[
                 { id: 'group', label: 'By Group', Icon: Users },
                 { id: 'school', label: 'By School', Icon: GraduationCap },
@@ -236,21 +237,21 @@ const ComparisonModal = ({
                 <button
                   key={type.id}
                   onClick={() => setComparisonType(type.id)}
-                  className={`p-4 rounded-card text-small font-medium transition-all ${
+                  className={`inline-flex items-center gap-1.5 h-9 px-3.5 rounded-pill text-small font-medium border transition-colors ${
                     comparisonType === type.id
-                      ? `${theme.bg} text-white`
-                      : 'bg-canvas text-secondary hover:bg-hairline-soft'
+                      ? `${theme.bg} text-white border-transparent`
+                      : 'bg-surface text-secondary border-hairline hover:bg-canvas'
                   }`}
                 >
-                  <type.Icon className="mx-auto mb-2 h-6 w-6" aria-hidden="true" />
-                  <div>{type.label}</div>
+                  <type.Icon className="h-4 w-4" aria-hidden="true" />
+                  {type.label}
                 </button>
               ))}
             </div>
           </div>
 
           {/* Selection Panel */}
-          <div className="mb-6 bg-canvas rounded-card p-4">
+          <div className="mb-6 bg-canvas rounded-card p-4 border border-hairline-soft">
             {comparisonType === 'group' && (
               <div>
                 <h4 className="text-small font-semibold text-secondary mb-3">Select Groups to Compare</h4>
@@ -259,10 +260,10 @@ const ComparisonModal = ({
                     <button
                       key={group}
                       onClick={() => toggleGroupSelection(group)}
-                      className={`px-4 py-2 rounded-ctrl text-small font-medium transition-all ${
+                      className={`px-4 py-2 rounded-pill text-small font-medium border transition-colors ${
                         selectedGroups.includes(group)
-                          ? `${theme.bg} text-white`
-                          : 'bg-surface text-secondary border border-hairline hover:bg-canvas'
+                          ? `${theme.bg} text-white border-transparent`
+                          : 'bg-surface text-secondary border-hairline hover:bg-canvas'
                       }`}
                     >
                       Group {group.replace('G', '')}
@@ -281,10 +282,10 @@ const ComparisonModal = ({
                     <button
                       key={school}
                       onClick={() => toggleSchoolSelection(school)}
-                      className={`px-4 py-2 rounded-ctrl text-small font-medium transition-all ${
+                      className={`px-4 py-2 rounded-pill text-small font-medium border transition-colors ${
                         selectedSchools.includes(school)
-                          ? `${theme.bg} text-white`
-                          : 'bg-surface text-secondary border border-hairline hover:bg-canvas'
+                          ? `${theme.bg} text-white border-transparent`
+                          : 'bg-surface text-secondary border-hairline hover:bg-canvas'
                       }`}
                     >
                       {school}
@@ -303,10 +304,10 @@ const ComparisonModal = ({
                     <button
                       key={ref.name}
                       onClick={() => toggleLocationSelection(ref.name)}
-                      className={`px-4 py-2 rounded-ctrl text-small font-medium transition-all ${
+                      className={`px-4 py-2 rounded-pill text-small font-medium border transition-colors ${
                         selectedLocations.includes(ref.name)
-                          ? `${theme.bg} text-white`
-                          : 'bg-surface text-secondary border border-hairline hover:bg-canvas'
+                          ? `${theme.bg} text-white border-transparent`
+                          : 'bg-surface text-secondary border-hairline hover:bg-canvas'
                       }`}
                     >
                       {ref.name}
@@ -327,10 +328,10 @@ const ComparisonModal = ({
                     <button
                       key={period}
                       onClick={() => setTimeRange(period)}
-                      className={`px-4 py-2 rounded-ctrl text-small font-medium transition-all ${
+                      className={`px-4 py-2 rounded-pill text-small font-medium border transition-colors ${
                         timeRange === period
-                          ? `${theme.bg} text-white`
-                          : 'bg-surface text-secondary border border-hairline hover:bg-canvas'
+                          ? `${theme.bg} text-white border-transparent`
+                          : 'bg-surface text-secondary border-hairline hover:bg-canvas'
                       }`}
                     >
                       {period.charAt(0).toUpperCase() + period.slice(1)}
@@ -342,16 +343,16 @@ const ComparisonModal = ({
           </div>
 
           {(comparisonType === 'group' || comparisonType === 'school') && (
-            <p className="mb-4 text-small text-secondary rounded-ctrl border border-blue-100 bg-blue-50 px-4 py-3">
+            <p className="mb-4 text-small text-secondary rounded-ctrl border border-hairline-soft bg-canvas px-4 py-3">
               Weekday averages from measurements already loaded in this session (your imported CSV / synced
               workspace data) — not a live query of other schools' private data. Cross-school crowdsourced
               comparisons need a shared-visibility decision from the team first.
             </p>
           )}
           {comparisonType === 'time' && (
-            <p className="mb-4 text-small text-secondary rounded-ctrl border border-amber-100 bg-amber-50 px-4 py-3">
-              Time-period comparisons are not wired to real data yet. Use <strong>By Location</strong>,{' '}
-              <strong>By Group</strong>, or <strong>By School</strong> instead.
+            <p className="mb-4 text-small text-secondary rounded-ctrl border border-hairline-soft bg-canvas px-4 py-3">
+              Time-period comparisons are not wired to real data yet. Use <strong className="text-fg font-medium">By Location</strong>,{' '}
+              <strong className="text-fg font-medium">By Group</strong>, or <strong className="text-fg font-medium">By School</strong> instead.
             </p>
           )}
 
@@ -449,23 +450,18 @@ const ComparisonModal = ({
                             </div>
                           </td>
                           <td className="px-4 py-3 text-fg font-semibold">{item.avg}</td>
-                          <td className="px-4 py-3 text-green-600 font-semibold">{min}</td>
-                          <td className="px-4 py-3 text-orange-600 font-semibold">{max}</td>
+                          <td className="px-4 py-3 text-fg font-semibold">{min}</td>
+                          <td className="px-4 py-3 text-fg font-semibold">{max}</td>
                           <td className="px-4 py-3 text-secondary">{max - min}</td>
                           <td className="px-4 py-3">
-                            <div className="flex items-center gap-1">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-canvas border border-hairline text-secondary text-cap font-semibold rounded-pill">
                               {trend === 'increasing' ? (
-                                <>
-                                  <TrendingUp className="w-4 h-4 text-orange-600" />
-                                  <span className="text-small text-orange-600 font-medium">Rising</span>
-                                </>
+                                <TrendingUp className="w-3 h-3" aria-hidden="true" />
                               ) : (
-                                <>
-                                  <TrendingDown className="w-4 h-4 text-green-600" />
-                                  <span className="text-small text-green-600 font-medium">Falling</span>
-                                </>
+                                <TrendingDown className="w-3 h-3" aria-hidden="true" />
                               )}
-                            </div>
+                              {trend === 'increasing' ? 'Rising' : 'Falling'}
+                            </span>
                           </td>
                         </tr>
                       );
@@ -476,36 +472,46 @@ const ComparisonModal = ({
             </div>
           </div>
 
-          {/* Key Insights */}
+          {/* Key Insights — plain card + accent bullet dots, matching the Overview tab's
+              Key Insights treatment, instead of a filled blue callout. */}
           {comparisonData.length > 0 && (
-            <div className="mt-6 bg-blue-50 rounded-card p-4 border border-blue-200">
-              <h4 className="mb-2 flex items-center gap-2 font-semibold text-blue-900">
-                <Lightbulb className="h-4 w-4" aria-hidden="true" />
+            <div className="mt-6 bg-surface rounded-card p-4 border border-hairline-soft">
+              <h4 className="mb-2 flex items-center gap-2 text-small font-semibold text-fg">
+                <Lightbulb className="h-4 w-4" style={{ color: theme.primary }} aria-hidden="true" />
                 Key Insights
               </h4>
-              <ul className="text-small text-blue-800 space-y-1">
-                <li>
-                  • Highest average:{' '}
-                  <strong>
-                    {comparisonData.reduce((max, item) => (item.avg > max.avg ? item : max), comparisonData[0]).name}
-                  </strong>{' '}
-                  (
-                  {comparisonData.reduce((max, item) => (item.avg > max.avg ? item : max), comparisonData[0]).avg}{' '}
-                  {metricThemes[selectedMetric].unit})
+              <ul className="text-small text-secondary space-y-1.5">
+                <li className="flex items-start gap-2">
+                  <span style={{ color: theme.primary }}>•</span>
+                  <span>
+                    Highest average:{' '}
+                    <strong className="text-fg font-medium">
+                      {comparisonData.reduce((max, item) => (item.avg > max.avg ? item : max), comparisonData[0]).name}
+                    </strong>{' '}
+                    (
+                    {comparisonData.reduce((max, item) => (item.avg > max.avg ? item : max), comparisonData[0]).avg}{' '}
+                    {metricThemes[selectedMetric].unit})
+                  </span>
                 </li>
-                <li>
-                  • Lowest average:{' '}
-                  <strong>
-                    {comparisonData.reduce((min, item) => (item.avg < min.avg ? item : min), comparisonData[0]).name}
-                  </strong>{' '}
-                  (
-                  {comparisonData.reduce((min, item) => (item.avg < min.avg ? item : min), comparisonData[0]).avg}{' '}
-                  {metricThemes[selectedMetric].unit})
+                <li className="flex items-start gap-2">
+                  <span style={{ color: theme.primary }}>•</span>
+                  <span>
+                    Lowest average:{' '}
+                    <strong className="text-fg font-medium">
+                      {comparisonData.reduce((min, item) => (item.avg < min.avg ? item : min), comparisonData[0]).name}
+                    </strong>{' '}
+                    (
+                    {comparisonData.reduce((min, item) => (item.avg < min.avg ? item : min), comparisonData[0]).avg}{' '}
+                    {metricThemes[selectedMetric].unit})
+                  </span>
                 </li>
-                <li>
-                  • Range across series:{' '}
-                  {Math.max(...comparisonData.map((d) => d.avg)) - Math.min(...comparisonData.map((d) => d.avg))}{' '}
-                  {metricThemes[selectedMetric].unit}
+                <li className="flex items-start gap-2">
+                  <span style={{ color: theme.primary }}>•</span>
+                  <span>
+                    Range across series:{' '}
+                    {Math.max(...comparisonData.map((d) => d.avg)) - Math.min(...comparisonData.map((d) => d.avg))}{' '}
+                    {metricThemes[selectedMetric].unit}
+                  </span>
                 </li>
               </ul>
             </div>
