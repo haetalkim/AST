@@ -154,6 +154,8 @@ const ANALYSIS_WORKSPACE_TOUR_STEPS = [
 const WORKSPACE_STORAGE_KEY = "airstory.currentWorkspaceId";
 /** Carries an invite token through the Firebase handshake (popup, refresh, log-in-then-accept). */
 const INVITE_TOKEN_STORAGE_KEY = "airstory.pendingInviteToken";
+/** The nav section the user is viewing, persisted so a reload stays put instead of resetting to Heat Map. */
+const ACTIVE_SECTION_STORAGE_KEY = "airstory.activeSection";
 
 function readInviteTokenFromLocation() {
   const pathMatch = window.location.pathname.match(/^\/join\/([A-Za-z0-9_-]{20,})/);
@@ -163,10 +165,13 @@ function readInviteTokenFromLocation() {
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [activeSection, setActiveSection] = useState("heatmap");
+  // False until Firebase reports the persisted session on reload. Until then we must not assume
+  // logged-out, or the login screen flashes before the restored session arrives.
+  const [authReady, setAuthReady] = useState(false);
+  const [activeSection, setActiveSection] = useState(
+    () => localStorage.getItem(ACTIVE_SECTION_STORAGE_KEY) || "heatmap"
+  );
   const [showAnalysisTour, setShowAnalysisTour] = useState(false);
-  // Bumped to signal MyPage to scroll/focus the school field (e.g. from Manage Classes "Edit").
-  const [schoolFocusNonce, setSchoolFocusNonce] = useState(0);
   const [selectedMetric, setSelectedMetric] = useState("pm25");
   const [isPublicMode] = useState(false); // Public mode is off when we have a landing/login
   const [workspaceId, setWorkspaceId] = useState("");
@@ -176,6 +181,10 @@ export default function App() {
   const [workspaceTooltip, setWorkspaceTooltip] = useState(null);
   /** All workspaces the user belongs to (from /auth/me), each with its embedded profile. */
   const [memberships, setMemberships] = useState([]);
+  /** Account identity + global profile from /auth/me (same in every workspace). Feeds My Page
+   * directly so it renders instantly without its own network round trip. */
+  const [account, setAccount] = useState(null); // { id, email, full_name }
+  const [accountProfile, setAccountProfile] = useState({ display_name: "", title: "", bio: "" });
   const [pendingInviteToken, setPendingInviteToken] = useState(() => {
     const fromUrl = readInviteTokenFromLocation();
     const token = fromUrl || sessionStorage.getItem(INVITE_TOKEN_STORAGE_KEY) || "";
@@ -280,9 +289,15 @@ export default function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setIsLoggedIn(Boolean(user));
+      setAuthReady(true);
     });
     return unsubscribe;
   }, []);
+
+  // Remember the current nav section so a reload returns here instead of resetting to Heat Map.
+  useEffect(() => {
+    localStorage.setItem(ACTIVE_SECTION_STORAGE_KEY, activeSection);
+  }, [activeSection]);
 
   const clearPendingInvite = useCallback(() => {
     sessionStorage.removeItem(INVITE_TOKEN_STORAGE_KEY);
@@ -307,6 +322,9 @@ export default function App() {
       setNeedsOnboarding(false);
       const nextMemberships = me?.memberships || [];
       setMemberships(nextMemberships);
+      // Global account data for My Page (workspace-independent).
+      setAccount(me?.user || null);
+      setAccountProfile(me?.profile || { display_name: "", title: "", bio: "" });
       const membership = pickMembership(nextMemberships);
       const profile = membership?.profile || null;
       // School is a per-class property (workspaces.school_id → membership.school_name), not the
@@ -804,6 +822,29 @@ export default function App() {
         { id: 'workspace', label: 'Workspace', icon: LayoutGrid },
       ];
 
+  // Wait for Firebase to report the persisted session before choosing login vs. app, so a reload
+  // of a signed-in user doesn't flash the login screen while the session is still being restored.
+  if (!authReady) {
+    return (
+      <div
+        className="min-h-screen bg-slate-50 font-sans text-slate-900 flex flex-col"
+        style={{
+          backgroundImage: `radial-gradient(#cbd5e1 1px, transparent 1px)`,
+          backgroundSize: '24px 24px',
+        }}
+      >
+        <div className="w-full h-1.5 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-600" />
+        <div className="flex-1 flex items-center justify-center">
+          <div
+            className="h-10 w-10 rounded-full border-4 border-slate-200 border-t-blue-600 animate-spin"
+            role="status"
+            aria-label="Loading"
+          />
+        </div>
+      </div>
+    );
+  }
+
   if (!isLoggedIn) {
     // The redesigned LandingPage owns its own full-bleed background/scroll layout,
     // so give it the bare shell; InviteLanding still wants the original centered card.
@@ -1014,9 +1055,10 @@ export default function App() {
                 >
                   <div className="hidden min-w-[12rem] max-w-[16rem] text-right lg:block xl:max-w-[20rem] 2xl:max-w-[24rem]">
                     <p className="truncate text-sm font-medium text-gray-900">
-                      {isTeacher
-                        ? (viewerProfile.displayName || viewerProfile.instructor || "Instructor")
-                        : (viewerProfile.displayName || viewerProfile.studentId || filters.studentId || "Student")}
+                      {accountProfile.display_name || account?.full_name ||
+                        (isTeacher
+                          ? (viewerProfile.displayName || viewerProfile.instructor || "Instructor")
+                          : (viewerProfile.displayName || viewerProfile.studentId || filters.studentId || "Student"))}
                     </p>
                     <p
                       className="truncate text-xs text-gray-500"
@@ -1127,18 +1169,12 @@ export default function App() {
         )}
         {activeSection === 'mypage' && (
           <MyPage
-            workspaceId={workspaceId}
-            userRole={userRole}
-            viewerProfile={viewerProfile}
-            filters={filters}
-            setFilters={setFilters}
             theme={currentTheme}
             onLogout={handleLogout}
-            classStructure={classStructure}
-            onProfileSaved={syncFromMe}
-            focusSchoolSignal={schoolFocusNonce}
-            schoolEditable={isTeacher && currentWorkspaceKind === "class"}
             memberships={memberships}
+            account={account}
+            profile={accountProfile}
+            onProfileSaved={setAccountProfile}
             switchWorkspace={switchWorkspace}
             workspaceFullName={workspaceFullName}
           />
@@ -1153,10 +1189,7 @@ export default function App() {
               if (next && typeof next === "object") setClassStructure(next);
               else refreshClassStructure();
             }}
-            onEditSchool={() => {
-              setActiveSection("mypage");
-              setSchoolFocusNonce((n) => n + 1);
-            }}
+            onSchoolChanged={syncFromMe}
           />
         )}
       </main>
