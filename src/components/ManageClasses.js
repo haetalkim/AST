@@ -14,8 +14,8 @@ import {
   updateStudentPlacement,
 } from '../api/auth';
 import { getSchools } from '../api/schools';
-import ConfirmDialog from './ConfirmDialog';
 import { extractInviteEmails, parseInviteSpreadsheet } from '../utils/inviteSpreadsheet';
+import ConfirmDialog from './ConfirmDialog';
 import Button from './ui/Button';
 import Card from './ui/Card';
 import SchoolCombobox from './SchoolCombobox';
@@ -29,7 +29,9 @@ function formatMemberContact(m) {
   return code.includes('@') ? code : `${code} (no domain)`;
 }
 
+/** A student is assigned only once they have both a period and a real group. */
 function needsGroupAssign(m) {
+  if (!m?.period) return true;
   const g = String(m?.group_code || '').trim();
   return !g || g === 'G?' || g === '?';
 }

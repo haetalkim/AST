@@ -1042,7 +1042,7 @@ export default function App() {
               })}
             </div>
 
-            {/* Account cluster: identity + logout stay together on the right */}
+            {/* Account cluster: click name/avatar for My Page; logout stays on the right. */}
             <div className="flex shrink-0 items-center gap-3 xl:gap-4">
               {!isPublicMode && (
                 <button
