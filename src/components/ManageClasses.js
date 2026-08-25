@@ -412,6 +412,15 @@ export default function ManageClasses({
   const coverageWarn = coveredGroups < totalGroupSlots;
   const hasSchool = Boolean(viewerProfile?.school && String(viewerProfile.school).trim());
   const teacherName = viewerProfile?.instructor || '—';
+  const groupCountValues = savedPeriods.map((p) => savedGroupCounts[p] || 0);
+  const uniqueGroupCounts = [...new Set(groupCountValues)];
+  const groupsHero = uniqueGroupCounts.length === 1 ? uniqueGroupCounts[0] : uniqueGroupCounts.join(' / ');
+  const groupsSub = savedPeriods
+    .map((p) => {
+      const n = savedGroupCounts[p] || 0;
+      return `${p} · ${n} group${n === 1 ? '' : 's'}`;
+    })
+    .join(', ') || '—';
 
   // Open the inline school editor: seed the input and pull the school directory for the picker.
   const openSchoolEditor = () => {
@@ -508,82 +517,92 @@ export default function ManageClasses({
             <p className="text-small text-muted mt-1">Current saved structure</p>
           </div>
         </div>
-        <div className="divide-y divide-hairline-soft mt-4">
-          <div className="flex items-start justify-between gap-4 py-3">
-            <p className="text-small text-muted">School · Teacher</p>
-            <div className="text-right min-w-0 max-w-[70%]">
-              {schoolEditing ? (
-                <div className="text-left">
-                  <SchoolCombobox
-                    id="school-input"
-                    value={schoolInput}
-                    onChange={(v) => { setSchoolInput(v); setSchoolError(''); }}
-                    options={schoolOptions.map((s) => s.name)}
-                    placeholder="Search or select a school"
-                    inputClassName="w-full px-3 py-2 border border-hairline rounded-ctrl bg-surface text-small text-fg"
-                  />
-                  <div className="flex flex-wrap justify-end gap-2 mt-2">
-                    <Button type="button" size="sm" variant="neutral" onClick={() => { setSchoolEditing(false); setSchoolError(''); }} disabled={schoolBusy}>
-                      Cancel
+        <div className="grid grid-cols-2 gap-px bg-hairline-soft border border-hairline-soft rounded-card overflow-hidden mt-5">
+          <div className="bg-surface p-4 min-w-0">
+            <p className="text-cap text-muted">School · Teacher</p>
+            {schoolEditing ? (
+              <div className="mt-2">
+                <SchoolCombobox
+                  id="school-input"
+                  value={schoolInput}
+                  onChange={(v) => { setSchoolInput(v); setSchoolError(''); }}
+                  options={schoolOptions.map((s) => s.name)}
+                  placeholder="Search or select a school"
+                  inputClassName="w-full px-3 py-2 border border-hairline rounded-ctrl bg-surface text-small text-fg"
+                />
+                <div className="flex flex-wrap gap-2 mt-2">
+                  <Button type="button" size="sm" variant="neutral" onClick={() => { setSchoolEditing(false); setSchoolError(''); }} disabled={schoolBusy}>
+                    Cancel
+                  </Button>
+                  {hasSchool && (
+                    <Button type="button" size="sm" variant="danger" onClick={handleRemoveSchool} disabled={schoolBusy}>
+                      Remove
                     </Button>
-                    {hasSchool && (
-                      <Button type="button" size="sm" variant="danger" onClick={handleRemoveSchool} disabled={schoolBusy}>
-                        Remove
-                      </Button>
-                    )}
-                    <Button type="button" size="sm" onClick={handleSaveSchool} disabled={schoolBusy}>
-                      {schoolBusy ? 'Saving…' : 'Save'}
-                    </Button>
-                  </div>
-                  {schoolError ? (
-                    <p className="text-cap text-aqi-unhealthy mt-1">{schoolError}</p>
-                  ) : (
-                    <p className="text-cap text-muted mt-1">
-                      Sets the school for this whole class — its members join the school workspace.
-                    </p>
                   )}
+                  <Button type="button" size="sm" onClick={handleSaveSchool} disabled={schoolBusy}>
+                    {schoolBusy ? 'Saving…' : 'Save'}
+                  </Button>
                 </div>
-              ) : (
-                <>
-                  <p className="text-small font-medium text-fg">
-                    {hasSchool ? viewerProfile.school : <span className="text-muted font-normal">Not set</span>}{' '}
-                    <button
-                      type="button"
-                      onClick={openSchoolEditor}
-                      className="text-small font-semibold text-link hover:underline"
-                    >
-                      (Edit)
-                    </button>
+                {schoolError ? (
+                  <p className="text-cap text-aqi-unhealthy mt-1">{schoolError}</p>
+                ) : (
+                  <p className="text-cap text-muted mt-1">
+                    Sets the school for this whole class — its members join the school workspace.
                   </p>
-                  <p className="text-cap text-muted mt-0.5">{teacherName}</p>
-                </>
-              )}
-            </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <p className="text-tile text-fg mt-1 break-words">
+                  {hasSchool ? viewerProfile.school : <span className="text-muted">Not set</span>}{' '}
+                  <button
+                    type="button"
+                    onClick={openSchoolEditor}
+                    className="align-middle text-small font-semibold text-link hover:underline"
+                  >
+                    (Edit)
+                  </button>
+                </p>
+                <p className="text-small text-muted mt-1">{teacherName}</p>
+              </>
+            )}
           </div>
-          <div className="flex items-center justify-between gap-4 py-3">
-            <p className="text-small text-muted">Periods</p>
-            <p className="text-small font-medium text-fg">{savedPeriods.join(', ') || '—'}</p>
+          <div className="bg-surface p-4 min-w-0">
+            <p className="text-cap text-muted">Periods</p>
+            <p className="text-page text-fg mt-1">{savedPeriods.length}</p>
+            <p className="text-small text-muted mt-1">{savedPeriods.join(', ') || '—'}</p>
           </div>
-          <div className="flex items-center justify-between gap-4 py-3">
-            <p className="text-small text-muted">Groups per period</p>
-            <p className="text-small font-medium text-fg">
-              {savedPeriods.map((p) => `${p} · ${savedGroupCounts[p] || 0}`).join(', ') || '—'}
-            </p>
+          <div className="bg-surface p-4 min-w-0">
+            <p className="text-cap text-muted">Groups per period</p>
+            <p className="text-page text-fg mt-1">{groupsHero || '—'}</p>
+            <p className="text-small text-muted mt-1">{groupsSub}</p>
           </div>
-          <div className="flex items-center justify-between gap-4 py-3">
-            <p className="text-small text-muted">Members joined</p>
-            <p className="text-small font-medium text-fg">{studentMembers.length}</p>
-          </div>
-          <div className="flex items-start justify-between gap-4 py-3">
-            <p className="text-small text-muted">Group coverage</p>
-            <div className="text-right">
-              <p className={`text-small font-medium ${coverageWarn ? 'text-aqi-usg' : 'text-aqi-good'}`}>
-                {coveredGroups} of {totalGroupSlots}
-              </p>
-              {coverageWarn && <p className="text-cap text-muted mt-0.5">Some groups have no account</p>}
-            </div>
+          <div className="bg-surface p-4 min-w-0">
+            <p className="text-cap text-muted">Members joined</p>
+            <p className="text-page text-fg mt-1">{studentMembers.length}</p>
+            <p className="text-small text-muted mt-1">of {totalGroupSlots} groups</p>
           </div>
         </div>
+        {coverageWarn && (
+          <div className="flex items-start gap-3 mt-4">
+            <span
+              className="flex items-center justify-center w-5 h-5 rounded-full bg-aqi-usg text-white text-cap font-bold shrink-0 mt-0.5"
+              aria-hidden="true"
+            >
+              !
+            </span>
+            <div>
+              <p className="text-small font-semibold text-fg">
+                {coveredGroups === 0 ? 'No group has an account yet.' : 'Some groups have no account.'}
+              </p>
+              <p className="text-small text-muted mt-0.5">
+                {coveredGroups === 0
+                  ? 'Send invitations below, and coverage fills in as students accept.'
+                  : `${coveredGroups} of ${totalGroupSlots} groups have at least one account.`}
+              </p>
+            </div>
+          </div>
+        )}
       </Card>
 
         {/* Class Structure */}
